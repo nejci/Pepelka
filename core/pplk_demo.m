@@ -1,5 +1,5 @@
 function pplk_demo()
-% Pepelka Package - Demo
+% Pepelka Package - Demoonstracija - Aleks
 
 params = [];
 [data, labelsT] = pplk_loadData(['artificial',filesep,'ring']);

@@ -1,0 +1,24 @@
+% validInt.info
+%
+% File contains information of USER DEFINED functions used for internal 
+% validation of clusterings obtained from clusterer or cluster ensemble. 
+%
+% FORMAT (TAB separated!): 
+% functionName	abbreviatedName	shortDescription
+%
+%	- functionName:		name (case-sensitive) of the function that performs cluster validation
+%	- abbreviatedName:	string that represents shortened function identifier; 
+%						it is used also as name of the field returned by function validInt (see Example)
+%	- shortDescription:	description of the function (optional)
+% 
+% EXAMPLE:
+% myValFun	MVF	My new function for internal clustering validation
+%
+% function myValFun has to exist and it has to take three input arguments and 
+% produce one output argument: 
+%
+%           out=myValFun(data,labels,options)
+%
+% Returned value 'out' is collected in the struct 'validInt' with field 'MVF'.
+
+silhueta	SIL2	Silhouette index custom

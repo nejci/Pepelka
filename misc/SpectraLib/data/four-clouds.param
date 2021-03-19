@@ -1,0 +1,8 @@
+4 clouds of 30 points each.
+10 lines between them each containing roughly 10 points .
+
+IN THAT ORDER (in case needed for classification) .
+Clusters classified as number and the outlier have class 0.
+
+AffinitySimilarityMatrix2D
+sigma=1.0000

@@ -1,0 +1,31 @@
+\begin{thebibliography}{NJW02}
+
+\bibitem[Mei02]{stat418}
+Marina Meila.
+\newblock Comparing clusterings.
+\newblock Technical Report 418, UW Statistics Department, 2002.
+
+\bibitem[MS00]{MeilaS00}
+Marina Meila and Jianbo Shi.
+\newblock Learning segmentation by random walks.
+\newblock In {\em NIPS}, pages 873--879, 2000.
+
+\bibitem[NJW02]{NgJW01}
+A.~Y. Ng, M.~I. Jordan, and Y.~Weiss.
+\newblock On spectral clustering: Analysis and an algorithm.
+\newblock In T.~G. Dietterich, S.~Becker, and Z.~Ghahramani, editors, {\em
+  Advances in Neural Information Processing Systems 14}, pages 849--856,
+  Cambridge, MA, 2002. MIT Press.
+
+\bibitem[VM03]{VM03}
+Deepak Verma and Marina Meila.
+\newblock A comparison of spectral methods.
+\newblock Technical Report UW-CSE-03-05-01, Dept. of Computer Science and
+  Engineering, University of Washington, 2003.
+
+\bibitem[Wal83]{wallas}
+David~L. Wallace.
+\newblock Comment.
+\newblock {\em J. Amer. Statist. Assoc.}, pages 269 -- 576, 1983.
+
+\end{thebibliography}

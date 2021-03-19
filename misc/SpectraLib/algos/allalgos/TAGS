@@ -1,0 +1,64 @@
+
+kvv1_cond.m,25
+function assignment=1,0
+
+kvv1_ncut.m,25
+function assignment=1,0
+
+kvv2_cond.m,25
+function assignment=1,0
+
+kvv2_ncut.m,25
+function assignment=1,0
+
+mcut_anchor.m,25
+function assignment=1,0
+
+mcut_kmeans.m,25
+function assignment=1,0
+
+mcut_mcut_kmeans.m,25
+function assignment=1,0
+
+mcut_mcut_ward.m,25
+function assignment=1,0
+
+mcut_ward.m,49
+function 1,0
+function [assignment_multicut,1,0
+
+njw_anchor.m,25
+function assignment=1,0
+
+njw_kmeans.m,25
+function assignment=1,0
+
+njw_mcut_kmeans.m,25
+function assignment=1,0
+
+njw_mcut_ward.m,25
+function assignment=1,0
+
+njw_njw_kmeans.m,26
+ function assignment=1,0
+
+njw_njw_ward.m,25
+function assignment=1,0
+
+njw_ward.m,25
+function assignment=1,0
+
+single_linkage.m,25
+function assignment=1,0
+
+sm_cond.m,25
+function assignment=1,0
+
+sm_gap.m,25
+function assignment=1,0
+
+sm_ncut.m,25
+function assignment=1,0
+
+ward_linkage.m,25
+function assignment=1,0

@@ -1,0 +1,8 @@
+gen_2D_mix_gauss_data
+numClusters=4
+numPoints=10   30   40   20
+center=1.014   3.982   2.373   7.880   8.713   9.064   4.825   2.456
+rho=0.250   0.250   0.250   0.250
+variance2D=0.200   0.200   1.000   0.800   0.300   0.200   0.500   0.800
+AffinitySimilarityMatrix2D
+sigma=1.000

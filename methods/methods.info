@@ -1,0 +1,19 @@
+% methods.info
+%
+% File contains information of USER DEFINED clustering methods. 
+%
+% FORMAT (tab separated): 
+% functionName	abbreviatedName	shortDescription
+%
+%	- functionName:		name (case-sensitive) of the function that performs clustering
+%	- abbreviatedName:	string that represents shortened function identifier; 
+%						it is used also as name of the field returned by function pplk_runClusterer (see Example)
+%	- shortDescription:	description of the function (optional)
+% 
+% EXAMPLE:
+% myFunc	MF	My new function for clustering
+%
+% function myFunc has to exist and it has to take three input arguments and 
+% produce one output argument, i.e.: labels = myFunc(data,k,params)
+
+kmeans2	KM2	K-means the second

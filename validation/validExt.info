@@ -1,0 +1,21 @@
+% validExt.info
+%
+% File contains information of USER DEFINED functions used for external 
+% validation of clusterings obtained from clusterer or cluster ensemble. 
+%
+% FORMAT (tab separated): 
+% functionName	abbreviatedName	shortDescription
+%
+%	- functionName:		name (case-sensitive) of the function that performs cluster validation
+%	- abbreviatedName:	string that represents shortened function identifier; 
+%						it is used also as name of the field returned by function validExt (see Example)
+%	- shortDescription:	description of the function (optional)
+% 
+% EXAMPLE:
+% myValFun	MVF	My new function for clustering validation
+%
+% function myValFun has to exist and it has to take two input arguments and 
+% produce one output argument, ie.: out=myValFun(c1,c2)
+% Returned value 'out' is collected in the struct 'retVal' with field 'MVF'.
+
+voi2	VOI2	Variation Of Information-test

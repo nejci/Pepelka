@@ -1,0 +1,143 @@
+\documentclass[10pt]{article}
+\setlength{\textheight}{9in} \setlength{\textwidth}{6.8in}
+\setlength{\topmargin}{-0.6in} \setlength{\oddsidemargin}{-0.2in}
+\begin{document}
+
+\title{Spectral Clustering Toolbox}
+\author{Deepak Verma ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Marina Meila \\\texttt{deepak@cs.washington.edu~~~~~~mmp@stat.washington.edu}}
+\maketitle
+
+
+\section{Introduction}
+\label{sec:intro}
+
+This toolbox contains the code written to perform various spectral
+clustering algorithms. The details related to the code and some
+experiments is available in \cite{VM03}. This document is very short and the
+reader is encourage to look at the directories to see other code.  
+
+\section{Using the toolbox}
+\subsection{Quick Start}
+\label{sec:quick}
+
+
+To get up and cranking : 
+
+\begin{enumerate}
+\item  Set \textsc{SPECTRAL\_HOME} to be the directory where you unpacked the
+  library.  
+\item  Start matlab.  
+\item  Call \texttt{init\_spectral}. (sets up the path
+  and global options).  
+\item 
+  \texttt{assignment=cluster\_algo(similarity,number\_of\_clusters)} :
+  Gives you the  desired clustering.     
+\item  Remember that all the vectors that you see
+  would be column vectors.
+\end{enumerate}
+
+
+
+\subsection{Data Input/Output}
+\label{sec:dataio}
+
+
+Reading a data file (see \texttt{data} directory for some examples). : 
+
+\texttt{[similarity,cluster\_assignments,points]=read\_from\_data\_file(filePrefix,directory)}
+\\
+Reads the data file \texttt{directory/filePrefix} (default
+dir=\texttt{data}) and assigns the \texttt{similarity}, the points and true
+\texttt{cluster\_assignments}. If either of the the above is not defined empty
+matrix is returned.
+
+
+
+
+\subsection{Spectral Algorithms}
+\label{sec:algos}
+
+
+The algorithms are present in the \texttt{algos} and
+\texttt{algos/allalgos} directory. The latter just contains files which
+act convenient shortcut names to popular algorithms. Algorithm
+\texttt{njw} is described in \cite{NgJW01} and \texttt{mcut} is
+described in \cite{MeilaS00}. For the details and comparison of all the
+algorithms see \cite{VM03}. 
+
+
+\section{Experimental Framework}
+\subsection{Running Experiments}
+\label{sec:exp}
+
+To run a bunch of experiments together use: 
+
+\texttt{run\_single\_experiment(dataFile,cluster\_algo\_list,k\_range,sigma,iterations,outdir,plot\_points)}
+
+This runs the experiments on \texttt{dataFile} for the algorithms
+\texttt{cluster\_algo\_list} ,varying the input number of clusters in
+the list \texttt{k\_range}. The \texttt{iterations} is the \emph{list}
+of iterations indices and are useful when there is a random element in
+the algorithm. \texttt{sigma} is the $\sigma$ used for affinity matrix (\cite{NgJW01}
+in case the points (see section \ref{sec:dataio} are present in
+\texttt{dataFile}. The results of each algorithm is written a file in
+the \texttt{outdir} (with a default value used). If
+\texttt{plot\_points} is 1 then the results are displayed after each
+iteration for 2D points. (default 0). 
+
+
+\subsection{Plotting graphs}
+\label{sec:plot}
+
+To the plot the graphs on the experiments ran using
+\texttt{run\_single\_experiment} use:
+
+\texttt{plot\_metric\_save(dataFile,cluster\_algo\_list,k\_range,iterations,metric,plot\_stdev,outdir)}
+
+The arguments mean the same as above. \texttt{metric} is used  specify the metric to be used
+to compare clustering produced w.r.t. true clustering. The metrics
+available are 
+\begin{itemize}
+\item \texttt{vi} : Variation of Information (\cite{stat418}). 
+\item \texttt{ce} : Clustering Error (see \cite{VM03} for details). 
+  
+\item \texttt{wi} : One sided Wallace Index (\cite{wallas}, also see
+  \cite{VM03}). 
+  
+\end{itemize}
+
+
+
+\section{Datasets}
+\label{sec:data}
+
+
+\subsection{Artificial}
+\label{sec:artdata}
+
+Some artificial datasets are provided in the \texttt{data}
+directory. All of them are 2D points which offers various levels of
+difficulty to the spectral algorithms. They are modelled after
+\cite{NgJW01}. To see these (or any other 2D) plots use
+\texttt{plot2Dpoints\_with\_clusters}. 
+
+An interesting dataset (not in 2D) called \texttt{block-stochastic}
+(\cite{MeilaS00}) is also provided. It is a similarity matrix designed
+(\cite{VM03}) to illustrate the case when spectral methods work and
+linkage based methods fail. 
+
+\subsection{Real Datasets}
+\label{sec:realdata}
+
+Coming soon....
+
+\section{Demo}
+
+Run \texttt{spectral\_demo} in the \texttt{demo} directory for seeing typical
+use of the library functions.   
+\small{
+  \bibliography{references}
+  \bibliographystyle{alpha}
+}
+
+\end{document}

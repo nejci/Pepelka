@@ -1,0 +1,141 @@
+function [labels, numClust, info] = SPECLS(data,K,Knn,mode,KMruns,KMiters)
+% SPECLS
+% [labels] = SPECLS(data,K,Knn,mode)
+% Spectral clustering with local scaling (Zelnik et al., 2004)
+%--------------------------------------------------------------------------
+% INPUTS
+%   data        (matrix)	matrix [N X d] with N d-dimensional samples
+%
+%   K           (scalar)	number of clusters to find in data.
+%               (vector)    multiple numbers of clusters - automatically
+%                           search for the true one among them. It works
+%                           only when mode is 'RLS' or 'R'.
+%	                        Leave empty [] to set the interval on [2,sqrt(n)]
+%
+%   Knn         (scalar)    number of neighbors to consider in local scaling;
+%                           default is 7.
+%   mode        (string)    'LS'  Locally Scaled clustering
+%                           'RLS' Rotation clustering with local scaling
+%                           'R'
+%                           if mode and K are empty, 'RLS' is selected
+%
+%
+% OUTPUTS
+%   labels      (vector)    data labels
+%               (matrix)    if CVI has more than one element and wMode is
+%                           'single', consensus is computed for every index
+%   numClust    (scalar)    number of output clusters
+%--------------------------------------------------------------------------
+% EXAMPLE
+%
+% [data,target] = pplk_loadData('rings3');
+% K_true = max(target);
+% labels_true = SPECLS(data,K_true);
+% labels_auto = SPECLS(data,[]);
+% labels_custom = SPECLS(data,2,10,'RLS');
+%
+% options.title = 'Spectral local scaling clustering';
+% options.subtitle = {'True', 'Auto', 'Custom'};
+% pplk_scatterPlot(data,[labels_true,labels_auto,labels_custom],[],options)
+%
+%------- REFERENCE --------------------------------------------------------
+% Zelnik-Manor, L., & Perona, P. (2004). Self-tuning spectral clustering.
+% Advances in neural information processing systems, 2, 1601�1608.
+%------- LEGAL NOTICE -----------------------------------------------------
+% Copyright (C) 2013  Nejc Ilc
+% Part of Pepelka package.
+%------- VERSION ----------------------------------------------------------
+% Version: 1.0
+% Last modified: 27-September-2013 by Nejc Ilc
+%------- CONTACT ----------------------------------------------------------
+% Please write to: Nejc Ilc <nejc.ilc@fri.uni-lj.si>
+%==========================================================================
+
+% Maximum number of clusters to automatically search to
+MAX_CLUSTERS_AUTO = 50; 
+
+N = size(data,1);
+
+if ~exist('K','var')
+    K = [];
+end
+if isempty(K)
+    % automatically search on default interval for true number of cluster
+    % limit upper bound of clusters
+    bound = min(MAX_CLUSTERS_AUTO, ceil(sqrt(N))); 
+    K = 2:bound; 
+end
+
+if isscalar(K)
+    K_isvec = 0;
+else
+    K_isvec = 1;
+end
+
+
+if ~exist('Knn','var') || isempty(Knn)
+    Knn = 7;
+end
+% Bound to the number of samples
+Knn = min(Knn,N-1);
+
+if ~exist('mode','var') || isempty(mode)
+    if K_isvec
+        mode = 'RLS';
+    else
+        mode = 'LS';
+    end
+end
+
+if K_isvec && strcmpi(mode,'LS')
+   warning('pplk:SPECLS','Cannot use mode LS when K is a vector or empty. Switching mode to RLS.'); 
+   mode = 'RLS';
+end
+
+if ~exist('KMruns','var') || isempty(KMruns)
+    KMruns = 20;
+end
+if ~exist('KMiters','var') || isempty(KMiters)
+    KMiters = 10;
+end
+
+% centralize and scale the data
+data = bsxfun(@minus,data,mean(data,1));
+data = data/max(abs(data(:)));
+
+% Build affinity matrix A
+D = dist2(data,data);    % squared Euclidean distance
+[~,A_LS] = scale_dist(D,Knn); % Locally scaled affinity matrix
+
+% Zero out diagonal
+N = size(data,1);
+A_LS(1:N+1:N^2) = 0;
+% ZERO_DIAG = ~eye(size(data,1));
+% A_LS = A_LS.*ZERO_DIAG;
+
+% Clustering
+switch upper(mode)
+    case 'LS'
+        % Zelnik-Perona Locally Scaled clustering
+        labels = gcut(A_LS,K,KMruns,KMiters);
+        
+    case 'RLS'
+        % Zelnik-Perona Rotation clustering with local scaling        
+        [clustCell, bestGroupIndex,~,~,timeRotate] = cluster_rotate(A_LS,K,1);
+        clusters = clustCell{bestGroupIndex};       
+        
+        labels = zeros(N,1);
+        for c = 1:length(clusters)
+            labels(clusters{c}) = c;
+        end
+
+    otherwise
+        error('Wrong mode!');
+end
+
+% transform labels to more convenient form
+numClust = max(labels);
+
+% more info
+info = [];
+info.timeRotate = timeRotate;

@@ -1,0 +1,7 @@
+gen_2D_cirlces
+numPoints=200
+angleStep=   0.100
+radiusList=5.000   10.000
+sigma=1.000   1.000
+AffinitySimilarityMatrix2D
+sigma=1.0000

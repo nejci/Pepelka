@@ -9,29 +9,42 @@ sep = repmat('-',1,50);
 fprintf('%s\nPepelka - data clustering package - SETUP\n%s\n\n',sep,sep);
 
 % Set home folder
-fprintf('Setting home folder in "core/pplk_homeDir.m" to:\n"%s" ',pwd());
-fid = fopen(['core',filesep,'pplk_homeDir.m'],'r');
-s = fread(fid,'*char')';
-fclose(fid);
-tokens = strsplit(s,'%%%FIELD-PATH%%%\n');
-tokens{2} = ['pplkPath = ''',pwd(),''';'];
-fid = fopen(['core',filesep,'pplk_homeDir.m'],'w');
-fprintf(fid,'%s%%%%%%FIELD-PATH%%%%%%\n%s\n%%%%%%FIELD-PATH%%%%%%\n%s',tokens{1},tokens{2},tokens{3});
-fclose(fid);
-fprintf('[OK]\n%s\n',sep);
-
-answ = input('Add "core" folder to the Matlab path? ([y]/n) > ','s');
-% Add to path
-if isempty(answ) || lower(answ)=='y' || strcmpi(answ,'yes')
-    addpath('core');
-    savepath();
-    fprintf('[OK]\n%s\n',sep);
+fprintf('Setting home folder ... ');
+fname = ['core',filesep,'pplk_userprefs.mat'];
+homeDir = pwd();
+if exist(fname,'file') == 2
+    % File with user's preferences already exists
+    saveIt = true;
+    % Check for existing field "homeDir"
+    varList = who('-file',fname);
+    if ismember('homeDir',varList)
+        saveIt = false;
+        L = load(fname,'homeDir');
+        if ~strcmpi(L.homeDir,pwd())
+            fprintf('\nVariable homeDir in %s is set to:\n%s\n', fname, L.homeDir);
+            answ = input('Overwrite with the current path? ([y]/n) > ','s');
+            if isempty(answ) || lower(answ)=='y' || strcmpi(answ,'yes')
+                saveIt = true;
+            end
+        end
+    end
+    if saveIt
+        save(fname, 'homeDir', '-append');
+        fprintf('%s\n',sep);
+    end
+else
+   save(fname, 'homeDir'); 
 end
+fprintf('[OK]\n');
 
-
+% Add to path
+fprintf('Adding "core" folder to the Matlab path ... ');
+addpath('core');
+savepath();
+fprintf('[OK]\n');
 
 % Compile
-answ = input('Do you want to compile MEX files required by some methods now? (You should set-up a compiler first.) ([y]/n) > ','s');
+answ = input('Do you want to compile MEX files required by some methods now?\n(You should set-up a compiler first.) ([y]/n) > ','s');
 if isempty(answ) || lower(answ)=='y' || strcmpi(answ,'yes')
     
     fprintf(1,'Compiling MEX files\n');

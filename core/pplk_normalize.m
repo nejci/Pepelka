@@ -214,7 +214,7 @@ function sD = pplk_normalize(sD,method,comps)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 callDir=chdir(pplk_homeDir());
-SOMTOOLBOX_PATH = ['..',filesep,'misc',filesep,'somtoolbox_pplk'];
+SOMTOOLBOX_PATH = ['..',filesep,'libs',filesep,'somtoolbox_pplk'];
 addpath(SOMTOOLBOX_PATH);
 
 %% check arguments

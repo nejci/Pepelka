@@ -13,7 +13,7 @@ if exist('params','var') && isstruct(params)
     end
 end
 
-oldPath=chdir('..\misc\SpectraLib');
+oldPath=chdir(['..',filesep,'libs',filesep,'SpectraLib']);
 
 %init toolbox (path to SpectraLib is added (SPECTRAL_HOME) and some global variables are created)
 startup;

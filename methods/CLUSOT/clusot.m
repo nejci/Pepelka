@@ -78,7 +78,7 @@ while i<=length(varargin),
 end
 
 % 1. level: SOM
-path_somtoolbox = [pplk_homeDir('misc'),'somtoolbox_pplk'];
+path_somtoolbox = [pplk_homeDir('libs'),'somtoolbox_pplk'];
 addpath(path_somtoolbox);
 
 ticID = tic();

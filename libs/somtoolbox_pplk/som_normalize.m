@@ -201,7 +201,7 @@ function sD = pplk_normalize(sD,method,comps)
 
 callDir=chdir(pplk_homeDir());
 
-SOMTOOLBOX_PATH = '..\misc\somtoolbox_pplk';
+SOMTOOLBOX_PATH = ['..',filesep,'libs',filesep,'somtoolbox_pplk'];
 SOMTOOLBOX_LOADED = 0;
 if strmatch(SOMTOOLBOX_PATH, path)
 	SOMTOOLBOX_LOADED = 1;
@@ -338,7 +338,7 @@ end
 %remove SOM Toolbox from MATLAB path only if it hasn't been used before
 %outside this function
 if ~SOMTOOLBOX_LOADED
-	rmpath('..\misc\somtoolbox_pplk');
+	rmpath(['..',filesep,'libs',filesep,'somtoolbox_pplk']);
 end
 chdir(callDir);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

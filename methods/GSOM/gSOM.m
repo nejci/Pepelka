@@ -157,7 +157,7 @@ function [retVal]=gSOM(data,G,dG,alfa,maxIter,pOut,msize,shape,showSOM,showGrav,
 % size determination of the SOM was smashed, some integration issues
 % resolved (function som_make is now fully customizable, taking additional
 % parameters through the cell array 'advanced').
-addpath('..\..\misc\somtoolbox_pplk');
+addpath(['..',filesep,'..',filesep,'libs',filesep,'somtoolbox_pplk']);
 
 %------- CHECK-IN ---------------------------------------------------------
 
@@ -689,7 +689,7 @@ end
 
 %------- UNLOAD SOM TOOLBOX -----------------------------------------------
 %remove SOM Toolbox from MATLAB path
-rmpath('..\..\misc\somtoolbox_pplk');
+rmpath(['..',filesep,'..',filesep,'libs',filesep,'somtoolbox_pplk']);
 
 end
 

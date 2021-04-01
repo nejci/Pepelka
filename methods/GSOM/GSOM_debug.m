@@ -36,7 +36,7 @@ function [retVal]=gSOM_debug(data,G,dG,alfa,maxIter,pOut,msize,shape,showSOM,sho
 %[retVal]=universeSuns(data,0.0008,0.045,0.01,100,0.1,[],'rect',1,2,0,2);
 
     %preusmerimo pot na spremenjeni som toolbox (hitrejsi PCA, popravek za rect/hexa size)
-    addpath('..\..\misc\somtoolbox_pplk');
+    addpath(['..',filesep,'..',filesep,'libs',filesep,'somtoolbox_pplk']);
     
 
     eps=1e-3;
@@ -388,6 +388,6 @@ function [retVal]=gSOM_debug(data,G,dG,alfa,maxIter,pOut,msize,shape,showSOM,sho
     retVal.SOMtrain=suns.SOMtrain;
     
     %izbrisemo pot na spremenjeni som toolbox
-    rmpath('..\..\misc\somtoolbox_pplk');
+    rmpath(['..',filesep,'..',filesep,'libs',filesep,'somtoolbox_pplk']);
     
 end

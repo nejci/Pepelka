@@ -16,7 +16,7 @@ function [labels,moreInfo] = pplk_clustererSOMNC(data,K,params)
 % Writen by Nejc Ilc
 % Last modification 3-January-2014
 
-path_somtoolbox = [pplk_homeDir('misc'),'somtoolbox_pplk'];
+path_somtoolbox = [pplk_homeDir('libs'),'somtoolbox_pplk'];
 addpath(path_somtoolbox);
 
 somSize = -1;

@@ -14,7 +14,7 @@ function [labels, moreInfo]=pplk_clustererSOMKM(data,K,params)
 % Last modification 20-December-2013
 
 % Add path to modified SOMtoolbox (faster PCA, bug fix for rect/hexa size)
-path_somtoolbox = [pplk_homeDir('misc'),'somtoolbox_pplk'];
+path_somtoolbox = [pplk_homeDir('libs'),'somtoolbox_pplk'];
 addpath(path_somtoolbox);
 
 N = size(data,1);

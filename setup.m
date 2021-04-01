@@ -51,7 +51,7 @@ if isempty(answ) || lower(answ)=='y' || strcmpi(answ,'yes')
     
     % DICLENS
     % Note: mst_mex.mex* and components_mex.mex* are from MATLAB BGL package:
-    % https://dgleich.github.io/matlab-bgl/ (misc\matlab_BGL\private)
+    % https://dgleich.github.io/matlab-bgl/ (libs\matlab_BGL\private)
     % 'fast' version
     folder = ['methods',filesep,'DICLENS',filesep,'fast',filesep];
     fprintf(1,'\n%s\n%s\n',sep,folder);
@@ -59,7 +59,7 @@ if isempty(answ) || lower(answ)=='y' || strcmpi(answ,'yes')
     mex('-largeArrayDims', '-outdir', folder, [folder,'computeG_mex.c'], 'OPTIMFLAGS="/openmp $OPTIMFLAGS"');
     mex('-largeArrayDims', '-outdir', folder, [folder,'DiclensMainLoop_mex.c']);
     mex('-largeArrayDims', '-outdir', folder, [folder,'majorityVoting_mex.c']);
-    folder_matlabBGL = ['misc',filesep,'matlab_BGL',filesep,'private',filesep];
+    folder_matlabBGL = ['libs',filesep,'matlab_BGL',filesep,'private',filesep];
     copyfile([folder_matlabBGL,'mst_mex.',mexext],folder);
     copyfile([folder_matlabBGL,'components_mex.',mexext],folder);
     % 'fastModW' version
@@ -69,7 +69,7 @@ if isempty(answ) || lower(answ)=='y' || strcmpi(answ,'yes')
     mex('-largeArrayDims', '-outdir', folder, [folder,'computeG_mex.c'], 'OPTIMFLAGS="/openmp $OPTIMFLAGS"');
     mex('-largeArrayDims', '-outdir', folder, [folder,'DiclensMainLoop_mex.c']);
     mex('-largeArrayDims', '-outdir', folder, [folder,'majorityVoting_mex.c']);
-    folder_matlabBGL = ['misc',filesep,'matlab_BGL',filesep,'private',filesep];
+    folder_matlabBGL = ['libs',filesep,'matlab_BGL',filesep,'private',filesep];
     copyfile([folder_matlabBGL,'mst_mex.',mexext],folder);
     copyfile([folder_matlabBGL,'components_mex.',mexext],folder);
     

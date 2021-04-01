@@ -18,7 +18,7 @@ function [labels,moreInfo] = SOMSTAR(data,somsize,smooth,show)
 % Requires Pepelka package
 
 % Add path to SOMtoolbox
-path_somtoolbox = [pplk_homeDir('misc'),'somtoolbox_pplk'];
+path_somtoolbox = [pplk_homeDir('libs'),'somtoolbox_pplk'];
 addpath(path_somtoolbox);
 
 % Input arguments check

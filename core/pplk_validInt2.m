@@ -10,7 +10,7 @@ function [validInt, list] = pplk_validInt2(data, labels, methods, options)
 %   labels      : labels of data, result of a clustering task
 %                 can be vector [nPatterns x 1] or matrix of labels [nPatterns x nNCs]
 %
-%	methods     : a cell containing one or more method's identifier.
+%   methods     : a cell containing one or more method's identifier.
 %				  You can use multiple methods, i.e., {'DN','SIL','WR'}.
 %				  If methods=[], all of them are computed.
 %
@@ -164,6 +164,10 @@ function [validInt, list] = pplk_validInt2(data, labels, methods, options)
 callDir=chdir(pplk_homeDir());
 
 [nrow, dim] = size(data);
+
+if ~iscell(methods)
+    methods = {methods};
+end
 
 %--------------------------------------------------------------------------
 % OPTIONS check

@@ -164,6 +164,10 @@ callDir=chdir(pplk_homeDir());
 
 [nrow, dim] = size(data);
 
+if ~iscell(methods)
+    methods = {methods};
+end
+
 %--------------------------------------------------------------------------
 % OPTIONS check
 

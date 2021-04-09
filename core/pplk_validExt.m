@@ -77,6 +77,8 @@ if isempty(methods)
     disp('No method given - computing all of them, incl. user-defined!');
     methods=[{'RI','ARI','JI','FM','CA','BCA','PDBCA','VOI','ADCO','NMI',...
         'NMIMAX','AMI','VM','B3C','B3E'}, usrAbbr'];  
+elseif ~iscell(methods)
+    methods = {methods};
 end
 
 nMethods=length(methods);

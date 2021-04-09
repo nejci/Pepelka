@@ -1,11 +1,12 @@
-function value = indexDNs_graph(G,data,labels,isDirected,graph_type,graphOpt,penalFun,penalFunP,penalFunLogMid)
+function value = indexDNs_graph(G,shortPaths,data,labels,isDirected,graph_type,graphOpt,penalFun,penalFunP,penalFunLogMid)
 % INDEXDNS_GRAPH computes the Modified Dunn's index on an already built graph.
 % Best cluster partition maximizes the index value.
-% value = INDEXDNS_GRAPH(G,data,labels,isDirected,graph_type,graphOpt,penalFun,penalFunP,penalFunLogMid)
+% value = INDEXDNS_GRAPH(G,shortPaths,data,labels,isDirected,graph_type,graphOpt,penalFun,penalFunP,penalFunLogMid)
 %--------------------------------------------------------------------------
 % INPUTS:
 %   G               (matrix)	graph on data points; output of function
 %                               graph_create()
+%   shortPaths      (matrix)    all shortest paths in graph G
 %   data		(matrix)	matrix [n X d] with n d-dimensional samples
 %	labels			(vector)	array of non-negative integers determining
 %								the labels of data samples
@@ -26,15 +27,15 @@ function value = indexDNs_graph(G,data,labels,isDirected,graph_type,graphOpt,pen
 % Copyright (C) 2016,  Nejc Ilc
 %
 %------- REFERENCE --------------------------------------------------------
-% Ilc, N. (2012). Modified Dunn�s cluster validity index based on graph
+% Ilc, N. (2012). Modified Dunn’s cluster validity index based on graph
 % theory. Przeglad Elektrotechniczny (Electrical Review), (2), 126-131.
 %
 %------- VERSION ----------------------------------------------------------
-% Version: 2.0
-% Last modified: 18-Feb-2016 by Nejc Ilc
+% Version: 2.1
+% Last modified: 14-July-2016 by Nejc Ilc
 %
 %------- CONTACT ----------------------------------------------------------
-% Please write to: Nejc Ilc <nejc.ilc@fri.uni-lj.si>
+% Please write to: Nejc Ilc <myName.mySurname@gmail.com>
 %==========================================================================
 
 
@@ -47,6 +48,7 @@ end
 K = max(labels);
 N = length(labels);
 assert(N==size(G,1),'Length of labels and size of graph matrix incosistent.');
+assert(N==size(shortPaths,1),'Length of labels and size of shortest paths matrix incosistent.');
 
 if  ~exist('penalFun','var') || isempty(penalFun)
     penalFun = 'logistic';
@@ -66,13 +68,20 @@ end
 if  ~exist('graphOpt','var') || isempty(graphOpt)
     graphOpt = [];
     graphOpt.graph_sqEucl = 0;
+    graphOpt.distMat = [];
+else
+    if ~isfield(graphOpt,'distMat')
+        graphOpt.distMat = [];
+    end
 end
 
 assert(isDirected == strcmpi(graph_type,'directedKnn'),'isDirected and graph_type not consistent.');
 
 
-% Find all (shortest) distances between data points (nodes in the [un]directed graph G)
-[dist_global] = graphallshortestpaths(G,'Directed',isDirected);
+if  isempty(shortPaths)
+	% Find all (shortest) distances between data points (nodes in the [un]directed graph G)
+	shortPaths = graphallshortestpaths(G,'Directed',isDirected);
+end
 
 % Compute diameter of each cluster.
 % Diameter is the longest distance between any points x and y, where x and
@@ -92,7 +101,13 @@ for k = 1:K
         diam(k) = sqrt(sum((dataSub(1,:)-dataSub(2,:)).^2));
     else
         % create new graph only with vertices from the current cluster
-        Gsub = graph_create(data(C_ind,:),[],graph_type,graphOpt);
+		% TODO: Use existing super (global) graph on all data points
+		% graphOpt.graphSuper = G;
+        graphOptSub = graphOpt;
+        if ~isempty(graphOpt.distMat)
+            graphOptSub.distMat = graphOptSub.distMat(C_ind,C_ind);
+        end
+        Gsub = graph_create(data(C_ind,:),[],graph_type,graphOptSub);
         
         % Find all (shortest) distances between data points (nodes in the [un]directed graph G)
         % Restrict search only on edges inside cluster = sub graph
@@ -122,7 +137,7 @@ for i=1:K-1
         Cj_members = (labels==j);
         
         % select distances between points in C_i and C_j clusters.
-        CiCj = dist_global(Ci_members,Cj_members);
+        CiCj = shortPaths(Ci_members,Cj_members);
         
         % compute minimum distance between C_i and C_j
         dist_CiCj(i,j) = min(min(CiCj));

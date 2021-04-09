@@ -29,11 +29,11 @@
 function [G,dist] = graph_rng(data,tol)
 if (nargin < 2)
     tol = [];
-end;
+end
 
 if (isempty(tol))
     tol = 1e-6;
-end;
+end
 
 
 [n,dim] = size(data);

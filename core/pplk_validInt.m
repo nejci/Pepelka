@@ -10,16 +10,16 @@ function [validInt, list] = pplk_validInt(data, labels, methods, options)
 %   labels      : labels of data, result of a clustering task
 %                 can be vector [nPatterns x 1] or matrix of labels [nPatterns x nNCs]
 %
-%	methods     : a cell containing one or more method's identifier.
-%				  You can use multiple methods, i.e., {'DN','SIL','WR'}.
-%				  If methods=[], all of them are computed.
+%   methods     : a cell containing one or more method's identifier.
+%                 You can use multiple methods, i.e., {'DN','SIL','WR'}.
+%                 If methods=[], all of them are computed.
 %
-%                 Note: indices that are designed ONLY for estimating number
-%                 of clusters are indicated with *
+% Note: indices that are designed ONLY for estimating number of clusters
+% are indicated with *
 %
-% ID        Method name                     Optimum	Reference
+%  ID       Method name                     Optimum	Reference
 % -------------------------------------------------------------------------
-% 'APN'     Avg. proportion of non-overlap	min     Datta & Datta, 2003
+% 'APN'     Avg. proportion of non-overlap  min     Datta & Datta, 2003
 % 'AD'      Average distance                min     Datta & Datta, 2003
 % 'ADM'     Average distance between means  min     Datta & Datta, 2003
 % 'BHI'     Biological homogeneity index    max     Datta & Datta, 2006
@@ -28,21 +28,21 @@ function [validInt, list] = pplk_validInt(data, labels, methods, options)
 % 'CI'      C-index                         min     Hubert & Levin, 1976
 % 'CON'     Connectivity index              min     Handl & Knowles, 2005
 % 'DB'      Davies-Bouldin index            min     Davies & Bouldin, 1979
-% 'DBMOD'   modified Davies-Bouldin index	min     Kim & Ramakrishna, 2005
+% 'DBMOD'   modified Davies-Bouldin index   min     Kim & Ramakrishna, 2005
 % 'DN'      Dunn index                      max     Dunn, 1973
 % 'DNG'     Dunn index using graphs         max     Pal & Biswas, 1997
 % 'DNS'     modified Dunn index             max     Ilc, 2012
 % 'FOM'     Figure of merit                 min     Yeung et al., 2001
-% 'GAMMA'	Gamma index                     min     Baker & Hubert, 1975
-% 'GDI_ij'  Generalized Dunn Indices (18)	max     Bezdek & Pal, 1998
-% 'GPLUS'	G(+) index                      max     Rohlf, 1974
-% 'HA' *    Hartigan index                  elbow	Hartigan, 1985
+% 'GAMMA'   Gamma index                     min     Baker & Hubert, 1975
+% 'GDI_ij'  Generalized Dunn Indices (18)   max     Bezdek & Pal, 1998
+% 'GPLUS'   G(+) index                      max     Rohlf, 1974
+% 'HA' *    Hartigan index                  elbow   Hartigan, 1985
 % 'HOM'     Homogeneity (average)           max     Sharan et al., 2003
 % 'HOMMIN'  Homogeneity (minimum)           max     Sharan et al., 2003
 % 'I'       I-index or PBM                  max     Maulik & Bandyopadhyay, 2002
 % 'KL' *    Krzanowski-Lai index            max     Krzanowski & Lai, 1988
 % 'SD' *    SD index                        min     Halkidi et al., 2000
-% 'SDBW'	S_Dbw index                     min     Halkidi & Vazirgiannis, 2001
+% 'SDBW'    S_Dbw index                     min     Halkidi & Vazirgiannis, 2001
 % 'SEP'     Separation (average)            min     Sharan et al., 2003
 % 'SEPMAX'  Separation (maximum)            min     Sharan et al., 2003
 % 'SF'      Score Function                  max     Saitta et al., 2008
@@ -50,8 +50,8 @@ function [validInt, list] = pplk_validInt(data, labels, methods, options)
 % 'SSI'     Simple Structure Index          max     Dolnicar et al., 1999
 % 'TAU'     Tau index                       min     Rohlf, 1974
 % 'VAR'     Variance index                  min     Handl & Knowles, 2005b
-% 'WR' *    Weighted inter-intra index      drop	Strehl, 2002
-% 'WRP'*    Penalized WR index              drop	Strehl, 2002
+% 'WR' *    Weighted inter-intra index      drop    Strehl, 2002
+% 'WRP'*    Penalized WR index              drop    Strehl, 2002
 % 'XB'      Xie-Beni index                  min     Xie & Beni, 1991
 % 'XBMOD'   modified Xie-Beni index         min     Kim & Ramakrishna, 2005
 % -------------------------------------------------------------------------
@@ -64,7 +64,7 @@ function [validInt, list] = pplk_validInt(data, labels, methods, options)
 %   options.NC  : vector that contains numbers of clusters, e.g., [2 3 4 5]
 %                 length(NC) and number of labels sets in labels must
 %                 match.
-%
+%   options.distMat: precomputed distance matrix
 %	options.CON_L : number of nearest neighbors considered when calculating
 %					CON index. If empty, default value of 5 is taken.
 %
@@ -125,8 +125,9 @@ function [validInt, list] = pplk_validInt(data, labels, methods, options)
 %                      clusters in labels.
 %   options.SHOW :  logical, whether to plot indices (1) or not (0, default)
 %
-%   options.graph : already built graph on data for DNs and DNg
-%   options.graph_type: type of a graph for DNs, DNg; default: 'gabriel'
+%   options.graph : already built graph on data for DNS and DNG
+%   options.graphShortPaths: already computed all shortest paths in graph
+%   options.graph_type: type of a graph for DNS, DNG; default: 'gabriel'
 %   options.uniqueInd : indeces of unique data points, required by DNs and
 %                       DNg
 %   options.graph_sqEucl: if weights of a graph are squared Euclidean
@@ -152,11 +153,11 @@ function [validInt, list] = pplk_validInt(data, labels, methods, options)
 % Copyright (C) 2013,  Nejc Ilc
 %
 %------- VERSION ----------------------------------------------------------
-% Version: 1.2.1
-% Last modified: 23-April-2014 by Nejc Ilc
+% Version: 1.3.0
+% Last modified: 09-April-2021 by Nejc Ilc
 %
 %------- CONTACT ----------------------------------------------------------
-% Please write to: Nejc Ilc <nejc.ilc@fri.uni-lj.si>
+% Please write to: Nejc Ilc <myName.mySurname@gmail.com>
 %==========================================================================
 
 
@@ -167,12 +168,14 @@ callDir=chdir(pplk_homeDir());
 if ~iscell(methods)
     methods = {methods};
 end
+% Convert to uppercase
+methods = upper(methods);
 
 %--------------------------------------------------------------------------
 % OPTIONS check
-
 % Defaults
 dtype = 'euclidean';
+Dmatrix = [];
 genenames = [];
 annotations = [];
 GO_aspect = [];
@@ -190,6 +193,7 @@ SD_alpha = [];
 NC = [];
 SHOW = 0;
 graph = [];
+graphShortPaths = [];
 penalFun = 'logistic';
 penalFunP = 1;
 penalFunLogMid = ceil(sqrt(nrow)/2);
@@ -202,6 +206,8 @@ if exist('options','var') && isstruct(options)
         switch lower(f)
             case 'dtype'
                 dtype=options.(f);
+            case 'distmat'
+                Dmatrix=options.(f);
             case 'genenames'
                 genenames = options.(f);
             case 'annotations'
@@ -238,6 +244,8 @@ if exist('options','var') && isstruct(options)
                 SHOW = options.(f);
             case 'graph'                
                 graph = options.(f);
+			case 'graphshortpaths'                
+                graphShortPaths = options.(f);
             case 'graph_type'                
                 graph_type = options.(f);
             case 'uniqueind' 
@@ -255,9 +263,6 @@ if exist('options','var') && isstruct(options)
         end
     end
 end
-
-% Convert to uppercase
-methods = upper(methods);
 
 % Errors
 if any(ismember(methods,{'BHI','BSI'}))
@@ -429,16 +434,21 @@ if (ischar(dtype) && (strcmpi(dtype,'pearson') || strcmpi(dtype,'correlation')))
 end
 
 if groupModeDmat
-    if isnumeric(data)
-        if strcmp(dname,'correlation')
-            % Pearson similarity [-1,1] is transformed to Pearson distance [0,1]             
-            Dvector = pdist(data,'correlation')/2;
+    if isempty(Dmatrix)
+        if isnumeric(data)
+            if strcmp(dname,'correlation')
+                % Pearson similarity [-1,1] is transformed to Pearson distance [0,1]
+                Dvector = pdist(data,'correlation')/2;
+            else
+                Dvector = pdist(data,dname);
+            end
+            Dmatrix = squareform(Dvector);
         else
-            Dvector = pdist(data,dname);
+            error('Input data should be numeric!');
         end
-        Dmatrix = squareform(Dvector);
     else
-        error('Input data should be numeric!');
+        % provide Dvector as well
+        Dvector = squareform(Dmatrix);
     end
 end
 
@@ -516,10 +526,11 @@ if groupModeAny
                 graph_sqEucl = 0;
             end
             graphOpt.graph_sqEucl = graph_sqEucl;
-            
+			graphOpt.distMat = Dmatrix.^2;
             oldDir = chdir(pplk_homeDir(['validation',filesep,'indexDNmod']));            
             [graph,~,uniqueInd] = graph_create(data,[],graph_type,graphOpt);
             chdir(oldDir);
+			
         % graph provided, check also provided parameters
         else            
             if ~exist('graph_sqEucl','var')
@@ -532,10 +543,16 @@ if groupModeAny
                 error('Graph provided but uniqueInd missing!');
             end
             graphOpt.graph_sqEucl = graph_sqEucl;
+			
         end
         % is graph directed?
         isDirected = strcmpi(graph_type, 'directedknn');
         
+		% compute all shortest paths only once
+		if ~exist('graphShortPaths','var') || isempty(graphShortPaths)
+			graphShortPaths = graphallshortestpaths(graph,'Directed',isDirected);
+		end
+		
         % if the removal of duplicates occured, update data and labels
         if ~isempty(uniqueInd)
             dataGraphNew = data(uniqueInd,:);
@@ -569,7 +586,7 @@ if groupModeAny
             % Dunn is probably returning wrong results (using external function)!
             % Davies-Bouldin is implemented in external file and gives identical
             % results as this one.
-            [DBdummy,CH(k),DNdummy,KL(k),HA(k),ST] = valid_internal_deviation(data,labels(:,k),dtype);
+            [~,CH(k),~,KL(k),HA(k),ST] = valid_internal_deviation(data,labels(:,k),dtype);
         end
         
         if groupModeHOM || groupModeSEP || groupModeWR
@@ -602,17 +619,8 @@ if groupModeAny
             end
             chdir(oldDir);            
         end
-        %if groupMode2
-            % weighted inter/intra ratio
-            % S = ind2cluster(labels(:,k));
-            
-            % the last parameter is set to 0 in order to compute all indices. To
-            % compute only CI, change it to 1
-            % [HOM(k), SEP(k), dummyCI, WR(k)] = valid_internal_intra(Dmatrix, S, dtype, 0);
-        %end
-        
-        if groupModeS
-            
+                
+        if groupModeS            
             % check if labels from clustering with deletion are available. If
             % not, create them using options.clMethod fed with options.clMethodParams
             if exist('options','var') && isstruct(options) && isfield(options,'labelsDel')
@@ -623,8 +631,7 @@ if groupModeAny
                     
                 else
                     error('Running stability method without labelsDel provided and clustering method unspecified. Provide with options.clMethod.');
-                end
-                
+                end                
             end
             % BSI
             if any(strcmpi('BSI',methods))
@@ -647,11 +654,11 @@ if groupModeAny
         if groupModeG
             oldDir = chdir(['..' filesep 'validation' filesep 'indexGammaGplusTau']);
             [G, Gmod, GPLUS(k), TAU(k)] = indexGammaGplusTau(Dvector,labels(:,k),1);
-            GAMMA(k) = G; % = Gmod % Gmod is a normalized version
+            GAMMA(k) = G;
+            %GAMMA(k) = Gmod; % Gmod is a normalized version
             chdir(oldDir);
         end
         
-                
         % If both SD and SDBW are selected
         if groupModeSD
             oldDir = chdir(['..' filesep 'validation' filesep 'indexSD_SDbw']);
@@ -673,7 +680,6 @@ if groupModeAny
             chdir(oldDir);
         end
     end
-    
     
     if groupMode1
         % If there are multiple clusterings to evaluate (to find number of
@@ -713,7 +719,7 @@ list = zeros(nMethods+nGDI-1,N);
 ind = 1;
 
 for mInd=1:nMethods
-    currMethod=upper(methods{mInd});
+    currMethod = methods{mInd};
     
     switch(currMethod)
         
@@ -747,7 +753,7 @@ for mInd=1:nMethods
             validInt.CH=CH;
             list(ind,:)=CH; ind = ind+1;
             
-        case 'CI'
+        case 'CI'            
             oldDir = chdir(['..' filesep 'validation' filesep 'indexCI']);
             CI = zeros(1,N);
             for k = NCind
@@ -799,6 +805,7 @@ for mInd=1:nMethods
             chdir(oldDir);
             
         case {'DNG'}
+			% TODO: update as DNS
             oldDir = chdir(['..' filesep 'validation' filesep 'indexDNmod']);
             DNG = zeros(1,N);
             for k = NCind
@@ -820,7 +827,8 @@ for mInd=1:nMethods
                 % data may cause inconsistency in labels (if singleton cluster
                 % was removed, one integer is missing in labels)
                 [~,~,labelsNewRepaired] = unique(labelsGraphNew(:,k));
-                DNS(k) = indexDNs_graph(graph,dataGraphNew,labelsNewRepaired,isDirected,graph_type,graphOpt,penalFun,penalFunP,penalFunLogMid);
+                DNS(k) = indexDNs_graph(graph,graphShortPaths,dataGraphNew,labelsNewRepaired,isDirected,graph_type,graphOpt,penalFun,penalFunP,penalFunLogMid);
+                
             end
             validInt.DNS = DNS;
             list(ind,:) = DNS; ind = ind+1;

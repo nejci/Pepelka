@@ -1,20 +1,18 @@
-% GABRIEL: Finds the Gabriel connectivity graph among points in P dimensions.
+function [G,dist] = graph_gabriel(data,tol,dist)
+% GRAPH_GABRIEL: Finds the Gabriel connectivity graph among N points in P dimensions.
 %
-%     Usage: [G,connect,dist] = graph_gabriel(data,{noplot},{tol})
+%     Usage: [G,connect,dist] = graph_gabriel(data,{tol},{dist})
 %
-%           data =    [n x p] matrix of point coordinates.
-%           noplot =  optional boolean flag indicating that plot should be
-%                       suppressed [default = 0].  Plot of the Gabriel graph
-%                       is produced only for p=2.
-%           tol =     optional tolerance for squared distance from a third point
-%                       to the minimum A-B circle (i.e., that circle on whose
-%                       circumference A & B are at opposite points) [default = 1e-6].
+%           data =    [N x P] matrix of point coordinates.
+%           tol  =    optional tolerance for squared distance from a third point
+%                     to the minimum A-B circle (i.e., that circle on whose
+%                     circumference A & B are at opposite points) [default = 1e-6].
+%           dist =    [N x N] matrix of precomputed pairwise point distances
 %           -------------------------------------------------------------------------
 %			G =		  [n x n] sparse matrix that represents a graph. Nonzero
 %					  entries in matrix G represent the weights of the edges.
-%           connect = [n x n] boolean adjacency matrix.
 %           dist =    corresponding edge lengths (Euclidean distances);
-%                       non-connected edge distances are given as zero.
+%                     non-connected edge distances are given as zero.
 %
 %
 % Gabriel, KR & RR Sokal. 1969. A new statistical approach to geographic variation
@@ -28,13 +26,14 @@
 %   10/23/02 - remove restriction of p==2;
 %              produce plot only for p==2.
 %   6/4/03   - added tolerance to the minimum A-B circle.
-%   11/19/13 - faster implementation by Nejc Ilc
-%   9/18/15  - added handling of data with 1 or 2 points by Nejc Ilc
-
-function [G,dist] = graph_gabriel(data,tol)
+% Nejc Ilc
+%   11/19/13 - faster implementation
+%            - added parameter dist - a precomuputed distance matrix
+%   9/18/15  - added handling of data with 1 or 2 points
 
 if (nargin < 2)
     tol = [];
+    dist = [];
 end
 
 if (isempty(tol))
@@ -43,22 +42,25 @@ end
 
 [n,dim] = size(data);
 
-dist = sqdistance2(data);
+if isempty(dist)
+    dist = sqdistance2(data);
+end
 
-% one point
+
 if n == 1
+    % only one data point
     %error('GABRIEL: requires at least two points ');
-    G = sparse(1,1); % zero scalar
+    G = sparse(1,1); % zero scalar    
     
-    % two points
 elseif n == 2
+    % two points
     G = sparse(2,1,dist(2,1),2,2); % distance between two points in lower left corner
     
 else
-    
+    % More than two points
     if dim < 4
         % for 2D and 3D cases employ Delaunay triangulation to speed things up.
-        % Gabriel is a subgraph of delaunay triangulation.
+        % Gabriel is a subgraph of Delaunay triangulation.
         DT = delaunayTriangulation(data);
         E = DT.edges;
         numE = size(E,1);
@@ -84,24 +86,25 @@ else
     else
         % MEX implementation
         d = gabriel(dist,tol);
-        % Pure Matlab code
-%         d = triu(dist);
-%         % Cycle thru all possible pairs of points
-%         for i = 1:(n-1)
-%             for j = (i+1):n
-%                 dij = dist(i,j);
-%                 for k = 1:n
-%                     if (k~=i && k~=j)
-%                         if (dist(i,k)+dist(j,k)-tol <= dij)
-%                             d(i,j) = 0;
-%                             break;
-%                         end
-%                     end
-%                 end
-%             end
-%         end
+        
+        % Pure Matlab code - slow
+        % d = triu(dist);
+        % % Cycle thru all possible pairs of points
+        % for i = 1:(n-1)
+        %     for j = (i+1):n
+        %         dij = dist(i,j);
+        %         for k = 1:n
+        %             if (k~=i && k~=j)
+        %                 if (dist(i,k)+dist(j,k)-tol <= dij)
+        %                     d(i,j) = 0;
+        %                     break;
+        %                 end
+        %             end
+        %         end
+        %     end
+        % end
     end
     
-    % form graph format
+    % form a graph format (diagonal elements are 0)
     G = sparse(tril(d',-1));
 end

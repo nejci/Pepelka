@@ -21,6 +21,8 @@ function [G,d,uniqueInd]=graph_create(data,labels,graph_type,options)
 %	options.show - if 0, plot of the graph is not shown [default=0]
 %   options.graph_sqEucl - if 1, weights in graph are squared Euclidean
 %                          distances, otherwise Euclidean (default).
+%   options.graphSuper - super (global) graph on data'. It holds that data \subset data'
+%   options.distMat - distance matrix (squared Euclidean distance)
 %--------------------------------------------------------------------------
 % OUTPUTS:
 %   G - sparse matrix representing a graph
@@ -35,7 +37,7 @@ if (nargin < 3)
 	  error(' GRAPH_CREATE: graph_type required!'); 
 end
 
-[N,D]=size(data);
+N = size(data,1);
 
 if isempty(labels)
 	labels=ones(N,1);
@@ -61,13 +63,27 @@ if ~isfield(options,'graph_sqEucl')
     options.graph_sqEucl=0;
 end
 
+if ~isfield(options,'distMat')
+    distMat = [];
+else
+	distMat = options.distMat;
+end
+
+if ~isfield(options,'graphSuper')
+    options.graphSuper = [];
+end
+
+
 
 % Check data for duplicates and remove them.
 [~,iA,~] = unique(data,'rows','first');
 uniqueInd = [];
 
 if length(iA) ~= N
-    warning('graph_create:unique','\nThere are duplicates in the data. Only unique data points will be considered.');
+    warning('graph_create:unique','There are duplicates in the data. Only unique data points will be considered.');
+	if ~isempty(options.graphSuper)
+		error('Super graph is defined but duplicates in sub data are found.');
+	end
     % keep the same sequence of data - only delete duplicates
     iA = sort(iA);
     labels=labels(iA);
@@ -75,21 +91,30 @@ if length(iA) ~= N
     uniqueInd = iA;
 end
 
+if isempty(distMat)
+	distMat = sqdistance2(data);
+else
+	if ~isempty(uniqueInd)
+		distMat = distMat(iA,iA);
+	end
+end
+
 % Construct graph on the data
+% TODO: use distMat for other graph types as well (not only Gabriel)
 switch(graph_type)
 	case 'rng'
-		%[G,d] = graph_rng_slow(data, 1, 1e-10);
         [G,d] = graph_rng(data, 1e-10);
 	
 	case 'gabriel'
-		%[G,d] = graph_gabriel_slow(data, 1, 1e-10);
-        [G,d] = graph_gabriel(data, 1e-10);
+        %[G,d] = graph_gabriel(data, 1e-10, distMat, options.graphSuper);
+        [G,d] = graph_gabriel(data, 1e-10, distMat);
 	
 	case 'EMST'
 		[G,d] = graph_EMST(data,[]);
 		
-	% WARNING! Knn (directed, mutual, symm) and epsilon graph will probably consists of more than one component,
-	% thus there could be no connection between clusters. 
+	% WARNING! Knn (directed, mutual, symm) and epsilon graph will probably 
+    % consists of more than one component. Thus, there could be no 
+    % connection between clusters. 
 	case 'directedKnn'
 		d = sqdistance2(data,data);
 		G = graph_directedKnn(d,options.k,'dist');

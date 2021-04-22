@@ -1,22 +1,20 @@
 function [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,options)
-% pplk_validExt
+% PPLK_VAILDEXT
 % [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,options)
 %
 %   External validity indices for comparing two partitions
 %   (ground truth vs. arbitrary partition).
 %
-%-------------------------------------------------------------------------------------------
-% INPUTS:
-%   labelsT         : ground truth clustering
 %
-%   labelsCons      : clusterer's output = compared clustering
+%   labelsT - ground truth clustering
+%   labelsCons - clusterer's output = compared clustering
 %
-%   methods         : is a cell containing one or more method's identifier.
-%                     If empty, all of them are included into result 
-%                     validExt.
+%   methodList is a cell containing one or more method's identifier.
+%   if empty, all of them are included into result validExt.
 %
-%   ID       METHOD NAME                        ADDITIONAL NOTES
-%--------------------------------------------------------------------------------------------
+% Implemented methods:
+%   ID       METHOD NAME
+%--------------------------------------------------------------------------
 %  'RI'      Rand Index
 %  'ARI'     Adjusted Rand Index
 %  'JI'      Jaccard Index
@@ -26,16 +24,14 @@ function [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,opt
 %  'PDBCA'   Posterior Distribution 
 %            Balanced Clustering Accuracy
 %  'VOI'     Variation of information
-%  'ADCO'    ADCO                                needed: options.data, options.bins
+%  'ADCO'    ADCO (needed: options.data, options.bins)
 %  'NMI'     Normalized Mutual Information 
 %           (NMIsqrt)
 %  'NMIMAX'  MAX Normalized Mutual Information
-%  'AMI'     Adjusted Mutual Information 
-%           (AMImax)
+%  'AMI'     Adjusted Mutual Information (AMImax)
 %  'VM'      V-measure
-%  'B3C'     B-Cubed measure (Clusters)          for B-Cubed F-measure averaged over Clusters
-%  'B3E'     B-Cubed measure (Elements)          for B-Cubed F-measure averaged over Elements
-%--------------------------------------------------------------------------------------------
+%  'B3C'     B-Cubed measures (method='B3C' for B-Cubed F-measure averaged over Clusters;
+%                       method='B3E' for B-Cubed F-measure averaged over Elements)
 %
 % Acknowledgements:
 % [1]   Cluster Validity Analysis Platform (CVAP) (Version 3.4) 2006-2007 by Kaijun Wang.

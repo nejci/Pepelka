@@ -1,5 +1,8 @@
 # User's preferences file
 /core/pplk_userprefs.mat
 
-# Matlab auto-saved files
+# Windows default autosave extension
 *.asv
+
+# OSX / *nix default autosave extension
+*.m~

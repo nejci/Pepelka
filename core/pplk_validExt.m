@@ -2,10 +2,10 @@ function [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,opt
 % pplk_validExt
 % [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,options)
 %
-%   External validity indices for comparing two partitions
-%   (ground truth vs. arbitrary partition).
+% External validity indices for comparing two partitions
+% (e.g., comparing to ground truth).
 %
-%-------------------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 % INPUTS:
 %   labelsT         : ground truth clustering
 %
@@ -16,7 +16,7 @@ function [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,opt
 %                     validExt.
 %
 %   ID       METHOD NAME                        ADDITIONAL NOTES
-%--------------------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 %  'RI'      Rand Index
 %  'ARI'     Adjusted Rand Index
 %  'JI'      Jaccard Index
@@ -26,31 +26,32 @@ function [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,opt
 %  'PDBCA'   Posterior Distribution 
 %            Balanced Clustering Accuracy
 %  'VOI'     Variation of information
-%  'ADCO'    ADCO                                needed: options.data, options.bins
-%  'NMI'     Normalized Mutual Information 
-%           (NMIsqrt)
+%  'ADCO'    Attribute Distribution              required options fields:
+%            Clustering Orthogonality            - options.data
+%                                                - options.bins
+%  'NMI'     Normalized Mutual Information       alias: 'NMISQRT'
 %  'NMIMAX'  MAX Normalized Mutual Information
-%  'AMI'     Adjusted Mutual Information 
-%           (AMImax)
+%  'AMI'     Adjusted Mutual Information         alias: 'AMIMAX'
 %  'VM'      V-measure
-%  'B3C'     B-Cubed measure (Clusters)          for B-Cubed F-measure averaged over Clusters
-%  'B3E'     B-Cubed measure (Elements)          for B-Cubed F-measure averaged over Elements
-%--------------------------------------------------------------------------------------------
-%
+%  'B3C'     B-Cubed measure (Clusters)          B-Cubed F-measure averaged
+%                                                over Clusters
+%  'B3E'     B-Cubed measure (Elements)          B-Cubed F-measure averaged
+%                                                over Elements
+%--------------------------------------------------------------------------
 % Acknowledgements:
-% [1]   Cluster Validity Analysis Platform (CVAP) (Version 3.4) 2006-2007 by Kaijun Wang.
-%       (http://www.mathworks.com/matlabcentral/fileexchange/14620)
+% [1] Cluster Validity Analysis Platform (CVAP) (v3.4) 2006-2007 by Kaijun
+%     Wang. http://www.mathworks.com/matlabcentral/fileexchange/14620
 %
-% [2]   SpectraLIB - Package for symmetric spectral clustering written by
-%       Deepak Verma (http://www.stat.washington.edu/spectral/#code)
+% [2] SpectraLIB - Package for symmetric spectral clustering written by
+%     Deepak Verma. http://www.stat.washington.edu/spectral/#code
 %
+% [3] Code for Adjusted Mutual Information (AMI_max), Nguyen Xuan Vinh
 %==========================================================================
 
 callDir=chdir(pplk_homeDir());
-
 moreInfo = [];
 
-%===========Arguments checking================================
+%=========== Arguments checking ===========================================
 if nargin < 2; error('Too few arguments!'); end
 
 % unify labels
@@ -58,12 +59,11 @@ if nargin < 2; error('Too few arguments!'); end
 labelsT = iT;
 numClustersTrue = length(uT);
 
-[uP,~,iP] = unique(labelsCons);
+[~,~,iP] = unique(labelsCons);
 labelsCons = iP;
-numClustersPredicted = length(uP);
 
 
-%===========User defined functions============================
+%=========== User defined functions =======================================
 f=fopen(['..',filesep,'validation',filesep,'validExt.info'],'r');
 usrfile=textscan(f,'%s %s %s %*[^\n]','delimiter','\t','commentStyle','%');
 fclose(f);
@@ -91,11 +91,15 @@ elseif ~iscell(methods)
 end
 
 nMethods=length(methods);
+methods = upper(methods);
 
+% Resolve aliases
+methods = strrep(methods,'NMISQRT','NMI');
+methods = strrep(methods,'AMIMAX','AMI');
 
-%============Common values=============================
-%form contingency table (or confusion matrix)
-%Required by: RI, ARI, JI, FM, AMI, CA, BCA, PDBCA, VM
+%============ Common values ===============================================
+% Create contingency table (or confusion matrix)
+% Required by: RI, ARI, JI, FM, AMI, CA, BCA, PDBCA, VM
 if any(ismember(methods,{'RI','ARI','JI','FM','AMI','CA','BCA','PDBCA','VM'}))
     C = getcm(labelsT,labelsCons);
     n = length(labelsT);
@@ -127,7 +131,7 @@ validExt = struct();
 list = zeros(1,nMethods);
 
 for ind=1:nMethods
-    currMethod=upper(methods{ind});
+    currMethod = methods{ind};
     
     switch(currMethod)
         
@@ -151,7 +155,7 @@ for ind=1:nMethods
             % of Classification, vol. 2 , pp. 193–218, 1985.
             nc=(n*(n^2+1)-(n+1)*nis-(n+1)*njs+2*(nis*njs)/n)/(2*(n-1));
             if ns==nc
-                ARI=0;			   %to avoid division by zero; if k=1, define Rand = 0
+                ARI;    %to avoid division by zero; if k=1, define Rand = 0
             else
                 ARI=(R-nc)/(ns-nc);
             end
@@ -399,7 +403,7 @@ for ind=1:nMethods
             
             % search is made in the list of abbreviations, stored in
             % usrAbbr string array.
-            idx = find(strcmp(currMethod,upper(usrAbbr)));
+            idx = find(strcmpi(currMethod,usrAbbr));
             if length(idx) > 1
                 disp(['Multiple matches for ', methods{ind}, '! Considering first occurence.']);
                 idx = idx(1);
@@ -472,10 +476,10 @@ end
 
 
 function simADCO=ADCO(data, c1, c2,q)
-%Implemented according to the paper
-%Eric Bae, James Bailey, Guozhu Dong: Clustering Similarity Comparison using density Profiles
+% Implemented according to the paper by Eric Bae, James Bailey, Guozhu Dong: 
+% Clustering Similarity Comparison using density Profiles
 %
-%Coding by: Nejc Ilc
+% Writen by: Nejc Ilc
 
 if ~exist('q','var')
     q=10;
@@ -636,7 +640,7 @@ n=sum(sum(T));
 N=n;
 
 %update the true dimensions
-[R C]=size(T);
+[R, C]=size(T);
 if C>1
     a=sum(T,2)';
 else
@@ -725,7 +729,7 @@ end
 
 Cont=zeros(max(Mem1),max(Mem2));
 
-for i = 1:length(Mem1);
+for i = 1:length(Mem1)
     Cont(Mem1(i),Mem2(i))=Cont(Mem1(i),Mem2(i))+1;
 end
 end

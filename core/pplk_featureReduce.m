@@ -99,20 +99,20 @@ function [dataR,featInd] = pplk_featureReduce(data, method, k, varargin)
 % Unsupervised Spectral feature selection
 %   Zhao, Z., & Liu, H. (2007). Spectral feature selection for
 %   supervised and unsupervised learning. Proceedings of the 24th
-%   international conference on Machine learning (pp. 1151�1157)
+%   international conference on Machine learning (pp. 1151-1157)
 %
 % Kernel Principal Component Analysis
-%   Bernhard Sch�lkopf, Alexander Smola, Klaus-Robert M�ller, �Nonlinear
+%   Bernhard Schölkopf, Alexander Smola, Klaus-Robert Müller. Nonlinear
 %   Component Analysis as a Kernel Eigenvalue Problem", Neural Computation,
 %   10:1299-1319, 1998.
 %   Code written by Deng Cai (dengcai AT gmail.com).
 %
 % Independent Component Analysis
-%   Hyv�rinen, A., & Oja, E. (2000).
+%   Hyvärinen, A., & Oja, E. (2000).
 %   Independent component analysis: algorithms and applications.
-%   Neural Networks, 13(4-5), 411�430.
-%   Code (FastICA) written by Hugo G�vert, Jarmo Hurri, Jaakko S�rel�,
-%   and Aapo Hyv�rinen.
+%   Neural Networks, 13(4-5), 411-430.
+%   FastICA code written by Hugo Gävert, Jarmo Hurri, Jaakko Särelä,
+%   and Aapo Hyvärinen.
 %--------------------------------------------------------------------------
 % File is a part of the Pepelka package.
 % (C) Nejc Ilc (nejc.ilc@fri.uni-lj.si)

@@ -40,9 +40,9 @@
 
 /* ////////////// sort array */
 typedef double T;
-void mysort(T* data, int N)
+void mysort(T* data, size_t N)
 {
-    int     i, j;
+    size_t     i, j;
     T       v, t;
     
     if(N<=1) return;
@@ -105,7 +105,7 @@ int nrhs, const mxArray* prhs[])
     const mwSize *idims =  mxGetDimensions(DISTMATRIX);
     if(idims[0] != idims[1])
         mexErrMsgTxt("Distance matrix must be square");
-    const int node_num = idims[0];
+    const size_t node_num = idims[0];
     
     if(mxIsSparse(DISTMATRIX)) {   /* Sparse matrix handling */
                       
@@ -116,7 +116,7 @@ int nrhs, const mxArray* prhs[])
         mwIndex *distmat_rows = mxGetIr(DISTMATRIX);
         mwIndex *distmat_cols = mxGetJc(DISTMATRIX);
         double *distmat_values = mxGetPr(DISTMATRIX);
-        int non_zero = mxGetNzmax(DISTMATRIX);
+        size_t non_zero = mxGetNzmax(DISTMATRIX);
         
         if( DEBUG )
             mexPrintf("There are %d non zeros\n",non_zero);
@@ -126,12 +126,12 @@ int nrhs, const mxArray* prhs[])
      * where K = neighbor_index
      */
         
-        int i,j;
+        size_t i,j;
         double *values,*neighbor_dist;
         neighbor_dist = (double*)mxCalloc(node_num,sizeof(double));
         
-        int starting_row_index, stopping_row_index, current_index;
-        int row_num,col_total, is_main_d_set;
+        size_t starting_row_index, stopping_row_index, current_index;
+        size_t row_num,col_total, is_main_d_set;
         for (j=0; j<node_num; j++)  {   /* loop over all columns */
             /* For each column fill in all the nonzero in the values array */
             starting_row_index = distmat_cols[j];
@@ -241,7 +241,7 @@ int nrhs, const mxArray* prhs[])
             valueK = values[K];  
             /* Save the distance to K'th neighbor */
             /* This is K and not K-1 since the distance to itself is also set */
-			if (abs(valueK) <= 1e-10)
+			if (fabs(valueK) <= 1e-10)
 				valueK = 0;
             neighbor_dist[j] = valueK;
 			

@@ -1,15 +1,15 @@
-function [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,options)
+function [validExt,list,moreInfo] = pplk_validExt(labelsA,labelsB,methods,options)
 % pplk_validExt
-% [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,options)
+% [validExt,list,moreInfo] = pplk_validExt(labelsA,labelsB,methods,options)
 %
 % External validity indices for comparing two partitions
 % (e.g., comparing to ground truth).
 %
 %--------------------------------------------------------------------------
 % INPUTS:
-%   labelsT         : ground truth clustering
+%   labelsA      : ground truth clustering
 %
-%   labelsCons      : clusterer's output = compared clustering
+%   labelsB      : clusterer's output = compared clustering
 %
 %   methods         : is a cell containing one or more method's identifier.
 %                     If empty, all of them are included into result 
@@ -55,13 +55,32 @@ moreInfo = [];
 if nargin < 2; error('Too few arguments!'); end
 
 % unify labels
-[uT,~,iT] = unique(labelsT);
-labelsT = iT;
+[uT,~,iT] = unique(labelsA);
+labelsA = iT;
 numClustersTrue = length(uT);
 
-[~,~,iP] = unique(labelsCons);
-labelsCons = iP;
+%[~,~,iP] = unique(labelsB); %skopiri kodo iz validInt Aleks
+%labelsB = iP;
 
+%Aleks
+numLabels = size(labelsB,2);
+%if isempty(NC)
+    if numLabels==1
+        % ensure that labels are integers 1:K
+        [clusterIDs, ~, labelsB] = unique(labelsB);
+        %NC = length(clusterIDs);        
+    else
+        %NC = zeros(1,numLabels);
+        for NCi = 1:numLabels
+            % ensure that labels are integers 1:K
+            [clusterIDs, ~, labelsB(:,NCi)] = unique(labelsB(:,NCi));
+            %NC(NCi) = length(clusterIDs);            
+        end
+    end
+%end
+
+%NL = length(NC);
+%endAleks
 
 %=========== User defined functions =======================================
 f=fopen(['..',filesep,'validation',filesep,'validExt.info'],'r');
@@ -97,331 +116,345 @@ methods = upper(methods);
 methods = strrep(methods,'NMISQRT','NMI');
 methods = strrep(methods,'AMIMAX','AMI');
 
-%============ Common values ===============================================
-% Create contingency table (or confusion matrix)
-% Required by: RI, ARI, JI, FM, AMI, CA, BCA, PDBCA, VM
-if any(ismember(methods,{'RI','ARI','JI','FM','AMI','CA','BCA','PDBCA','VM'}))
-    C = getcm(labelsT,labelsCons);
-    n = length(labelsT);
-    nis=sum(sum(C,2).^2);		%sum of squares of sums of rows
-    njs=sum(sum(C,1).^2);		%sum of squares of sums of columns    
-    ns = n*(n-1)/2;	         %total number of pairs  (n 2)
-    sumC=sum(sum(C.^2));	 %sum over rows & columnns of nij^2
-    sumij = nis+njs;    
-    R = ns+sumC-sumij*0.5;    %no. agreements; disagreements -t2+sumij*0.5;
-    
-    % some methods work with confusion matrix that is adjusted (cluster aligned
-    % to classed by majority)
-    if any(ismember(methods,{'CA','BCA','PDBCA'}))
-        oldPath=chdir(['..',filesep,'validation',filesep,'PDBAC']);
-        [Caligned,~,hungarianCost] = getcmClust(C);
-        moreInfo.ConfMat = Caligned;
-        chdir(oldPath);
-    end
-end
-
-% Precompute I(x;y), H(x), H(y) for information-based methods
-if any(ismember(methods,{'AMI','NMI','NMIMAX','VOI'}))
-    [NMI,MI,Hx,Hy] = nmi(labelsT,labelsCons);
-    Hx = full(Hx);
-    Hy = full(Hy);
-end
-
+%tle definu return argumente Aleks
 validExt = struct();
-list = zeros(1,nMethods);
-
-for ind=1:nMethods
-    currMethod = methods{ind};
-    
-    switch(currMethod)
-        
-        case 'RI'
-            %============= Rand index =====================================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % W. M. Rand, “Objective Criteria for the Evaluation of
-            % Clustering Methods,” Journal of the American Statistical
-            % Association, vol. 66, no. 336, pp. 846–850, 1971.
-            validExt.RI = R/ns;
-            list(ind) = validExt.RI;
-            
-        case 'ARI'
-            %============= Adjusted Rand index ============================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % L. Hubert and P. Arabie, “Comparing partitions,” Journal
-            % of Classification, vol. 2 , pp. 193–218, 1985.
-            nc=(n*(n^2+1)-(n+1)*nis-(n+1)*njs+2*(nis*njs)/n)/(2*(n-1));
-            if ns==nc
-                ARI;    %to avoid division by zero; if k=1, define Rand = 0
-            else
-                ARI=(R-nc)/(ns-nc);
-            end
-            validExt.ARI=ARI;
-            list(ind) = validExt.ARI;
-            
-        case 'JI'
-            %============= Jaccard index ==================================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % Jain, A., Dubes, R.: Algorithms for Clustering Data.
-            % Prentice-Hall, Englewood Cliffs (1988)
-            validExt.JI = (sumC-n)/(sumij-sumC-n);
-            list(ind) = validExt.JI;
-            
-        case 'FM'
-            %============= Fowlkes and Mallows ============================
-            % 0 - labelsT is identical to labelsCons
-            % 1 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % E. B. Fowlkes and C. L. Mallows. A method for comparing two
-            % hierarchical clusterings. Journal of the American Statistical
-            % Association, 78(383):553–569, 1983.
-            ni = sum(C,2);
-            ni = ni.*(ni-1)/2;
-            nis = sum(ni);
-            nj = sum(C,1);
-            nj = nj.*(nj-1)/2;
-            njs = sum(nj);
-            validExt.FM = 1 - 0.5*(sumC-n)/sqrt(nis*njs);
-            list(ind) = validExt.FM;
-            
-        case 'CA'
-            %============= Clustering Accuracy ============================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % M. Meilã, “Comparing clusterings -- an information based
-            % distance,” Journal of Multivariate Analysis, vol. 98, pp.
-            % 873–895, 2007.
-            validExt.CA = -hungarianCost/n;
-            list(ind) = validExt.CA;
-            
-        case 'BCA'
-            %============= Balanced Clustering Accuracy ===================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % H. Carrillo, K. H. Brodersen, and J. A. Castellanos,
-            % “Probabilistic Performance Evaluation for Multiclass
-            % Classification Using the Posterior Balanced Accuracy,” in
-            % ROBOT2013: First Iberian Robotics Conference SE - 25, vol.
-            % 252, M. A. Armada, A. Sanfeliu, and M. Ferre, Eds. Springer
-            % International Publishing, 2014, pp. 347–361.
-            a = diag(Caligned)./sum(Caligned,2);
-            a(isnan(a))=0;
-            % NAPAKA! 
-            %validExt.BCA = (1/size(Caligned,1))*sum(a);
-            % namesto size(Caligned,1) bi moralo biti stevilo
-            % razredov v labelsT
-            validExt.BCA = (1/numClustersTrue)*sum(a);
-            list(ind) = validExt.BCA;
-            
-            
-        case 'PDBCA'
-            %=== Posterior Distribution Balanced Classification Accuracy ==
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % H. Carrillo, K. H. Brodersen, and J. A. Castellanos,
-            % “Probabilistic Performance Evaluation for Multiclass
-            % Classification Using the Posterior Balanced Accuracy,” in
-            % ROBOT2013: First Iberian Robotics Conference SE - 25, vol.
-            % 252, M. A. Armada, A. Sanfeliu, and M. Ferre, Eds. Springer
-            % International Publishing, 2014, pp. 347–361.
-            alpha = 0.05;
-            res = 0.001;
-            computeCI = 0;
-            show = 0;
-            
-            if exist('options','var') && isstruct(options)
-                if(isfield(options,'alpha'))
-                    alpha = options.alpha;
-                end
-                if(isfield(options,'res'))
-                    res = options.res;
-                end
-                if(isfield(options,'computeCI'))
-                    computeCI = options.computeCI;
-                end
-                if(isfield(options,'show'))
-                    show = options.show;
-                end
-            end
-            
-            oldPath=chdir(['..',filesep,'validation',filesep,'PDBAC']);
-            
-            if computeCI
-                [bmean,CI] = PDBAC(Caligned,[],alpha,show,res);
-                moreInfo.PDBAC_CI = CI;
-            else
-                bmean = PDBAC(Caligned,[],alpha,show,res);
-            end
-            
-            validExt.PDBCA = bmean;
-            list(ind) = validExt.PDBCA;
-            
-            chdir(oldPath);
-            
-        case 'VOI'
-            %============ Variation Of Information ========================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            % original VOI index is distance metric: 1-validExt.VOI
-            %--------------------------------------------------------------
-            % M. Meilã, “Comparing clusterings - an information based
-            % distance,” Journal of Multivariate Analysis, vol. 98, pp.
-            % 873–895, 2007.
-            VOI = 1 - (Hx + Hy - 2*MI)/log(length(labelsT));
-            validExt.VOI = VOI;
-            list(ind) = validExt.VOI;
-            
-        case 'ADCO'
-            %===== Attribute Distribution Clustering Orthogonality ========
-            % 0 - labelsT is identical to labelsCons
-            % 1 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % E. Bae, J. Bailey, and G. Dong, “Clustering Similarity
-            %Comparison Using Density Profiles,” in in AI 2006: Advances in
-            %Artificial Intelligence, vol. 4304 , A. Sattar and B.-H. Kang,
-            %Eds. Springer Berlin / Heidelberg , 2006, pp. 342–351.
-            
-            if (exist('options','var'))
-                if(isfield(options,'data'))
-                    if(isfield(options,'bins'))
-                        validExt.ADCO=ADCO(options.data, labelsT, labelsCons,options.bins);
-                    else
-                        %default value for bins is 10
-                        validExt.ADCO=ADCO(options.data, labelsT, labelsCons,10);
-                    end
-                    list(ind) = validExt.ADCO;
-                else
-                    disp('Warning: ADCO -> Missing options.data field! Ignoring ADCO!');
-                end
-            else
-                disp('Warning: ADCO -> Missing options variable! Ignoring ADCO!');
-            end
-            
-        case 'NMI'
-            %============ Normalized Mutual Information ===================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % A. Strehl and J. Ghosh, “Cluster ensembles - a knowledge
-            % reuse framework for combining multiple partitions,” The
-            % Journal of Machine Learning Research, vol. 3, pp. 583–617,
-            % 2003.
-            validExt.NMI=NMI;
-            list(ind) = validExt.NMI;
-            
-        case 'NMIMAX'
-            %============ Normalized Mutual Information Max ===============
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % NMIMAX proposed in:
-            % A. Kraskov, H. Stögbauer, R. G. Andrzejak, and P.
-            % Grassberger, “Hierarchical clustering using mutual
-            % information,” Europhysics Letters, vol. 70, no. 2, pp.
-            % 278–284, 2005.
-            NMIMAX = MI/max(Hx,Hy);
-            if abs(NMIMAX)<eps
-                NMIMAX = 0;
-            end
-            validExt.NMIMAX=NMIMAX;
-            list(ind) = validExt.NMIMAX;
-            
-        case 'AMI'
-            %============ Adjusted Mutual Information =====================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % N. X. Vinh, J. Epps, and J. Bailey, “Information Theoretic
-            % Measures for Clusterings Comparison: Variants, Properties,
-            % Normalization and Correction for Chance,” Journal of Machine
-            % Learning Research, vol. 11, pp. 2837–2854, Dec. 2010.
-            AMI = ami(C,[],MI,Hx,Hy);
-            validExt.AMI = AMI;
-            list(ind) = validExt.AMI;
-            
-        case 'VM'
-            %============= V-Measure ======================================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % A. Rosenberg and J. Hirschberg, “V-Measure: A Conditional
-            % Entropy-Based External Cluster Evaluation Measure,” in
-            % Proceedings of the 2007 Joint Conference on Empirical Methods
-            % in Natural Language Processing and Computational Natural
-            % Language Learning, 2007, pp. 410–420.
-            beta = 1.0;
-            if (exist('options','var'))
-                if(isfield(options,'beta'))
-                    beta = options.beta;
-                end
-            end
-            
-            oldPath=chdir(['..',filesep,'validation',filesep,'vmeasure']);
-            validExt.VM = vmeasure(C,beta);
-            list(ind) = validExt.VM;
-            chdir(oldPath);
-            
-        case 'B3C'
-            %============= B-Cubed Cluster ================================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % A. Bagga and B. Baldwin, “Algorithms for Scoring Coreference
-            % Chains,” in In The First International Conference on Language
-            % Resources and Evaluation Workshop on Linguistics Coreference,
-            % 1998, pp. 563–566.
-            oldPath=chdir(['..',filesep,'validation',filesep,'BCUBED']);
-            validExt.B3C = bCubedCluster(labelsT,labelsCons);
-            list(ind) = validExt.B3C;
-            chdir(oldPath);
-            
-        case 'B3E'
-            %============= B-Cubed Element ================================
-            % 1 - labelsT is identical to labelsCons
-            % 0 - labelsT is totally different to labelsCons
-            %--------------------------------------------------------------
-            % A. Bagga and B. Baldwin, “Algorithms for Scoring Coreference
-            % Chains,” in In The First International Conference on Language
-            % Resources and Evaluation Workshop on Linguistics Coreference,
-            % 1998, pp. 563–566.
-            oldPath=chdir(['..',filesep,'validation',filesep,'BCUBED']);
-            validExt.B3E = bCubedElement(labelsT,labelsCons);
-            list(ind) = validExt.B3E;
-            chdir(oldPath);
-            
-        otherwise
-            % Check for user-defined imported functions, relating file
-            % validExt.info .
-            
-            % search is made in the list of abbreviations, stored in
-            % usrAbbr string array.
-            idx = find(strcmpi(currMethod,usrAbbr));
-            if length(idx) > 1
-                disp(['Multiple matches for ', methods{ind}, '! Considering first occurence.']);
-                idx = idx(1);
-            end
-            
-            if ~isempty(idx)
-                oldPath=chdir(['..',filesep,'validation',filesep]);
-                disp(['USER-DEFINED :: Executing function: ',usrAbbr{idx},'=',usrMeth{idx},'(...) -- ',usrDesc{idx}])
-                validExt.(usrAbbr{idx})=feval(str2func(usrMeth{idx}),labelsT,labelsCons);
-                list(ind) = validExt.(usrAbbr{idx});
-                chdir(oldPath);
-            else
-                disp(['Non-existing method name: ', methods{ind}, '! Ignoring.']);
-                validExt  = NaN;
-                list = NaN;
-            end
-    end
+list = zeros(numLabels,nMethods);
+for method = methods
+    mchar = char(method(1));
+    validExt.(mchar) = zeros(1,numLabels);
 end
+
+
+%zacni s forom tle Aleks
+for curlabel=1:numLabels
+    %============ Common values ===============================================
+    % Create contingency table (or confusion matrix)
+    % Required by: RI, ARI, JI, FM, AMI, CA, BCA, PDBCA, VM
+    if any(ismember(methods,{'RI','ARI','JI','FM','AMI','CA','BCA','PDBCA','VM'}))
+        C = getcm(labelsA,labelsB(:, curlabel));
+        n = length(labelsA);
+        nis=sum(sum(C,2).^2);		%sum of squares of sums of rows
+        njs=sum(sum(C,1).^2);		%sum of squares of sums of columns    
+        ns = n*(n-1)/2;	         %total number of pairs  (n 2)
+        sumC=sum(sum(C.^2));	 %sum over rows & columnns of nij^2
+        sumij = nis+njs;    
+        R = ns+sumC-sumij*0.5;    %no. agreements; disagreements -t2+sumij*0.5;
+
+        % some methods work with confusion matrix that is adjusted (cluster aligned
+        % to classed by majority)
+        if any(ismember(methods,{'CA','BCA','PDBCA'}))
+            oldPath=chdir(['..',filesep,'validation',filesep,'PDBAC']);
+            [Caligned,~,hungarianCost] = getcmClust(C);
+            moreInfo.ConfMat = Caligned;
+            chdir(oldPath);
+        end
+    end
+
+    % Precompute I(x;y), H(x), H(y) for information-based methods
+    if any(ismember(methods,{'AMI','NMI','NMIMAX','VOI'}))
+        [NMI,MI,Hx,Hy] = nmi(labelsA,labelsB(:, curlabel));
+        Hx = full(Hx);
+        Hy = full(Hy);
+    end
+
+    %validExt = struct(); %Aleks
+    %list = zeros(1,nMethods);
+
+    for ind=1:nMethods
+        currMethod = methods{ind};
+
+        switch(currMethod)
+
+            case 'RI'
+                %============= Rand index =====================================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % W. M. Rand, “Objective Criteria for the Evaluation of
+                % Clustering Methods,” Journal of the American Statistical
+                % Association, vol. 66, no. 336, pp. 846–850, 1971.
+                validExt.RI(curlabel) = R/ns;
+                list(curlabel, ind) = validExt.RI(curlabel);
+
+            case 'ARI'
+                %============= Adjusted Rand index ============================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % L. Hubert and P. Arabie, “Comparing partitions,” Journal
+                % of Classification, vol. 2 , pp. 193–218, 1985.
+                nc=(n*(n^2+1)-(n+1)*nis-(n+1)*njs+2*(nis*njs)/n)/(2*(n-1));
+                if ns==nc
+                    ARI;    %to avoid division by zero; if k=1, define Rand = 0
+                else
+                    ARI=(R-nc)/(ns-nc);
+                end
+                validExt.ARI(curlabel)=ARI;
+                list(curlabel, ind) = validExt.ARI(curlabel);
+
+            case 'JI'
+                %============= Jaccard index ==================================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % Jain, A., Dubes, R.: Algorithms for Clustering Data.
+                % Prentice-Hall, Englewood Cliffs (1988)
+                validExt.JI(curlabel) = (sumC-n)/(sumij-sumC-n);
+                list(curlabel, ind) = validExt.JI(curlabel);
+
+            case 'FM'
+                %============= Fowlkes and Mallows ============================
+                % 0 - labelsA is identical to labelsB
+                % 1 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % E. B. Fowlkes and C. L. Mallows. A method for comparing two
+                % hierarchical clusterings. Journal of the American Statistical
+                % Association, 78(383):553–569, 1983.
+                ni = sum(C,2);
+                ni = ni.*(ni-1)/2;
+                nis = sum(ni);
+                nj = sum(C,1);
+                nj = nj.*(nj-1)/2;
+                njs = sum(nj);
+                validExt.FM(curlabel) = 1 - 0.5*(sumC-n)/sqrt(nis*njs);
+                list(curlabel, ind) = validExt.FM(curlabel);
+
+            case 'CA'
+                %============= Clustering Accuracy ============================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % M. Meilã, “Comparing clusterings -- an information based
+                % distance,” Journal of Multivariate Analysis, vol. 98, pp.
+                % 873–895, 2007.
+                validExt.CA(curlabel) = -hungarianCost/n;
+                list(curlabel, ind) = validExt.CA(curlabel);
+
+            case 'BCA'
+                %============= Balanced Clustering Accuracy ===================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % H. Carrillo, K. H. Brodersen, and J. A. Castellanos,
+                % “Probabilistic Performance Evaluation for Multiclass
+                % Classification Using the Posterior Balanced Accuracy,” in
+                % ROBOT2013: First Iberian Robotics Conference SE - 25, vol.
+                % 252, M. A. Armada, A. Sanfeliu, and M. Ferre, Eds. Springer
+                % International Publishing, 2014, pp. 347–361.
+                a = diag(Caligned)./sum(Caligned,2);
+                a(isnan(a))=0;
+                % NAPAKA! 
+                %validExt.BCA = (1/size(Caligned,1))*sum(a);
+                % namesto size(Caligned,1) bi moralo biti stevilo
+                % razredov v labelsA
+                validExt.BCA(curlabel) = (1/numClustersTrue)*sum(a);
+                list(curlabel, ind) = validExt.BCA(curlabel);
+
+
+            case 'PDBCA'
+                %=== Posterior Distribution Balanced Classification Accuracy ==
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % H. Carrillo, K. H. Brodersen, and J. A. Castellanos,
+                % “Probabilistic Performance Evaluation for Multiclass
+                % Classification Using the Posterior Balanced Accuracy,” in
+                % ROBOT2013: First Iberian Robotics Conference SE - 25, vol.
+                % 252, M. A. Armada, A. Sanfeliu, and M. Ferre, Eds. Springer
+                % International Publishing, 2014, pp. 347–361.
+                alpha = 0.05;
+                res = 0.001;
+                computeCI = 0;
+                show = 0;
+
+                if exist('options','var') && isstruct(options)
+                    if(isfield(options,'alpha'))
+                        alpha = options.alpha;
+                    end
+                    if(isfield(options,'res'))
+                        res = options.res;
+                    end
+                    if(isfield(options,'computeCI'))
+                        computeCI = options.computeCI;
+                    end
+                    if(isfield(options,'show'))
+                        show = options.show;
+                    end
+                end
+
+                oldPath=chdir(['..',filesep,'validation',filesep,'PDBAC']);
+
+                if computeCI
+                    [bmean,CI] = PDBAC(Caligned,[],alpha,show,res);
+                    moreInfo.PDBAC_CI = CI;
+                else
+                    bmean = PDBAC(Caligned,[],alpha,show,res);
+                end
+
+                validExt.PDBCA(curlabel) = bmean;
+                list(curlabel, ind) = validExt.PDBCA(curlabel);
+
+                chdir(oldPath);
+
+            case 'VOI'
+                %============ Variation Of Information ========================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                % original VOI index is distance metric: 1-validExt.VOI
+                %--------------------------------------------------------------
+                % M. Meilã, “Comparing clusterings - an information based
+                % distance,” Journal of Multivariate Analysis, vol. 98, pp.
+                % 873–895, 2007.
+                VOI = 1 - (Hx + Hy - 2*MI)/log(length(labelsA));
+                validExt.VOI(curlabel) = VOI;
+                list(curlabel, ind) = validExt.VOI(curlabel);
+
+            case 'ADCO'
+                %===== Attribute Distribution Clustering Orthogonality ========
+                % 0 - labelsA is identical to labelsB
+                % 1 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % E. Bae, J. Bailey, and G. Dong, “Clustering Similarity
+                %Comparison Using Density Profiles,” in in AI 2006: Advances in
+                %Artificial Intelligence, vol. 4304 , A. Sattar and B.-H. Kang,
+                %Eds. Springer Berlin / Heidelberg , 2006, pp. 342–351.
+
+                if (exist('options','var'))
+                    if(isfield(options,'data'))
+                        if(isfield(options,'bins'))
+                            validExt.ADCO(curlabel)=ADCO(options.data, labelsA, labelsB(:, curlabel),options.bins);
+                        else
+                            %default value for bins is 10
+                            validExt.ADCO(curlabel)=ADCO(options.data, labelsA, labelsB(:, curlabel),10);
+                        end
+                        list(curlabel, ind) = validExt.ADCO(curlabel);
+                    else
+                        disp('Warning: ADCO -> Missing options.data field! Ignoring ADCO!');
+                    end
+                else
+                    disp('Warning: ADCO -> Missing options variable! Ignoring ADCO!');
+                end
+
+            case 'NMI'
+                %============ Normalized Mutual Information ===================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % A. Strehl and J. Ghosh, “Cluster ensembles - a knowledge
+                % reuse framework for combining multiple partitions,” The
+                % Journal of Machine Learning Research, vol. 3, pp. 583–617,
+                % 2003.
+                validExt.NMI(curlabel)=NMI;
+                list(curlabel, ind) = validExt.NMI(curlabel);
+
+            case 'NMIMAX'
+                %============ Normalized Mutual Information Max ===============
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % NMIMAX proposed in:
+                % A. Kraskov, H. Stögbauer, R. G. Andrzejak, and P.
+                % Grassberger, “Hierarchical clustering using mutual
+                % information,” Europhysics Letters, vol. 70, no. 2, pp.
+                % 278–284, 2005.
+                NMIMAX = MI/max(Hx,Hy);
+                if abs(NMIMAX)<eps
+                    NMIMAX = 0;
+                end
+                validExt.NMIMAX(curlabel)=NMIMAX;
+                list(curlabel, ind) = validExt.NMIMAX(curlabel);
+
+            case 'AMI'
+                %============ Adjusted Mutual Information =====================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % N. X. Vinh, J. Epps, and J. Bailey, “Information Theoretic
+                % Measures for Clusterings Comparison: Variants, Properties,
+                % Normalization and Correction for Chance,” Journal of Machine
+                % Learning Research, vol. 11, pp. 2837–2854, Dec. 2010.
+                AMI = ami(C,[],MI,Hx,Hy);
+                validExt.AMI(curlabel) = AMI;
+                list(curlabel, ind) = validExt.AMI(curlabel);
+
+            case 'VM'
+                %============= V-Measure ======================================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % A. Rosenberg and J. Hirschberg, “V-Measure: A Conditional
+                % Entropy-Based External Cluster Evaluation Measure,” in
+                % Proceedings of the 2007 Joint Conference on Empirical Methods
+                % in Natural Language Processing and Computational Natural
+                % Language Learning, 2007, pp. 410–420.
+                beta = 1.0;
+                if (exist('options','var'))
+                    if(isfield(options,'beta'))
+                        beta = options.beta;
+                    end
+                end
+
+                oldPath=chdir(['..',filesep,'validation',filesep,'vmeasure']);
+                validExt.VM(curlabel) = vmeasure(C,beta);
+                list(curlabel, ind) = validExt.VM(curlabel);
+                chdir(oldPath);
+
+            case 'B3C'
+                %============= B-Cubed Cluster ================================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % A. Bagga and B. Baldwin, “Algorithms for Scoring Coreference
+                % Chains,” in In The First International Conference on Language
+                % Resources and Evaluation Workshop on Linguistics Coreference,
+                % 1998, pp. 563–566.
+                oldPath=chdir(['..',filesep,'validation',filesep,'BCUBED']);
+                validExt.B3C(curlabel) = bCubedCluster(labelsA,labelsB(:, curlabel));
+                list(curlabel, ind) = validExt.B3C(curlabel);
+                chdir(oldPath);
+
+            case 'B3E'
+                %============= B-Cubed Element ================================
+                % 1 - labelsA is identical to labelsB
+                % 0 - labelsA is totally different to labelsB
+                %--------------------------------------------------------------
+                % A. Bagga and B. Baldwin, “Algorithms for Scoring Coreference
+                % Chains,” in In The First International Conference on Language
+                % Resources and Evaluation Workshop on Linguistics Coreference,
+                % 1998, pp. 563–566.
+                oldPath=chdir(['..',filesep,'validation',filesep,'BCUBED']);
+                validExt.B3E(curlabel) = bCubedElement(labelsA,labelsB(:, curlabel));
+                list(curlabel, ind) = validExt.B3E(curlabel);
+                chdir(oldPath);
+
+            otherwise
+                % Check for user-defined imported functions, relating file
+                % validExt.info .
+
+                % search is made in the list of abbreviations, stored in
+                % usrAbbr string array.
+                idx = find(strcmpi(currMethod,usrAbbr));
+                if length(idx) > 1
+                    disp(['Multiple matches for ', methods{ind}, '! Considering first occurence.']);
+                    idx = idx(1);
+                end
+
+                if ~isempty(idx)
+                    oldPath=chdir(['..',filesep,'validation',filesep]);
+                    disp(['USER-DEFINED :: Executing function: ',usrAbbr{idx},'=',usrMeth{idx},'(...) -- ',usrDesc{idx}])
+                    validExt.(usrAbbr{idx})(curlabel)=feval(str2func(usrMeth{idx}),labelsA,labelsB(:, curlabel));
+                    list(curlabel, ind) = validExt.(usrAbbr{idx})(curlabel);
+                    chdir(oldPath);
+                else
+                    disp(['Non-existing method name: ', methods{ind}, '! Ignoring.']);
+                    validExt  = NaN;
+                    list = NaN;
+                end
+        end
+    end
+
+end
+%end od mojga fora Aleks
 
 chdir(callDir);
 

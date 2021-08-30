@@ -1,17 +1,19 @@
 function [fig] = pplk_validPlotMulti(validResults, numClust, validMethods, clustMethods)
 
-% validResults  (cell)      cell of [numValidMethods X length(numClust)]
-%                           matrices with values of indeces in rows
+% validResults
+%       A cell of numValidMethods-by-length(numClust) matrices with values
+%       of indeces in rows.
 %
-% numClust      (vector)    vector of integers; for each index value 
-%                           (columns of validResults) it gives the number
-%                           of clusters
+% numClust
+%       A vector of integers; for each index value (columns of
+%       validResults) it gives the number of clusters.
 %
-% validMethods  (cell)      cell of validation methods used to validate
-%                           clustering results
+% validMethods 
+%       A cell of validation methods used to validate clustering results.
 %
-% clustMethods  (cell)      cell of clustering methods used to produce
-%                           results
+% clustMethods 
+%       A cell of clustering methods used to produce results.
+%
 
 numClust_len=length(numClust);
 numClustMethods = length(clustMethods);

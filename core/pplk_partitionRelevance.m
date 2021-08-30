@@ -1,129 +1,169 @@
 function [weights,PRM,featInd]=pplk_partitionRelevance(data,labelsEns,indicesList,unifyMethod,reduceMethod,weightMethod,weightMode,options)
-% [weights,PRM]=pplk_partitionRelevance(data,labelsEns,indicesList,unifyMethod,reduceMethod,weightMethod,weightMode,options)
-%
+% [weights,PRM]=pplk_partitionRelevance(data,labelsEns,indicesList,
+% unifyMethod,reduceMethod,weightMethod,weightMode,options)
 % Partition Relevance step in clustering ensembles.
-%--------------------------------------------------------------------------
+%
 % INPUTS
-%   data		: data that were clustered [nPatterns x nDimensions]
-%               : can be empty if options.CVImat is provided (values of
-%               cluster validation indices have been pre-computed)
-%   labelsEns   : ensemble of labels - result of a ensemble generation
-%				  step in a matrix [N x ensembleSize].
-% .........................................................................
-%	indicesList : 
-%      a cell containing one or more cluster validity indices:
+%   data
+%       - A nPatterns-by-nDimensions matrix of data that were clustered.
+%       - Can be empty if options.CVImat is provided (values of cluster
+%         validation indices have been pre-computed).
 %
-% ID        Method name                     Best   Parameters (options.___)
-% 'APN'     Avg. proportion of non-overlap  min    clMethod | labelsDel
-% 'AD'      Average distance                min    clMethod | labelsDel
-% 'ADM'     Average distance between means  min    clMethod | labelsDel
-% 'BHI'     Biological homogeneity index    max    genenames, annotations,
-%                                                  GO_aspect, GO_evidence
-% 'BSI'     Biological stability index      max    same as BHI
-% 'CH'      Calinski-Harabasz               max
-% 'CI'      C-index                         min
-% 'CON'     Connectivity index              min    CON_L
-% 'DB'      Davies-Bouldin index            min    DB_p, DB_q
-% 'DB*'     modified Davies-Bouldin index   min
-% 'DN'      Dunn index                      max
-% 'DNG'     Dunn index using graphs         max
-% 'DNS'     modified Dunn index             max
-% 'FOM'     Figure of merit                 min    clMethod | labelsDel
-% 'GAMMA'   Gamma index                     min
-% 'GDI'     Generalized Dunn Indices (18)   max    GDI_interdist, GDI_intradist
-% 'GPLUS'   G(+) index                      max
-% 'HOM'     Homogeneity (average)           max
-% 'HOMMIN'  Homogeneity (minimum)           max
-% 'I'       I-index or PBM                  max
-% 'SD'      SD index                        min    SD_alpha
-% 'SDBW'    S_Dbw index                     min
-% 'SEP'     Separation (average)            min
-% 'SEPMAX'  Separation (maximum)            min
-% 'SF'      Score Function                  max
-% 'SIL'     Silhouette index (average)      max
-% 'SSI'     Simple Structure Index          max
-% 'TAU'     Tau index                       min
-% 'VAR'     Variance index                  min
-% 'XB'      Xie-Beni index                  min
-% 'XB*'     modified Xie-Beni index         min
+%   labelsEns   
+%       Ensemble of labels - result of an ensemble generation step in a
+%       N-by-ensembleSize matrix.
 %
-%  Optionally, you can use multiple methods, i.e., {'DN','SIL','WR'}.
-%  If empty, none of them is calculated.
-% .........................................................................
-%   unifyMethod:
-%           which unification method to use:
-%           - 'minmax': max-like: value_i/max, min-like: min/value_i
-%           - 'range' : normalize on [0,1]
-%           - 'range0': move range to start with 0
-%           - 'range1': move range to end with 1
-%           - 'pos'   : move indeces with negative values to start with 0
-%           - 'prob'  : transform to probabilities, sum is 1
-%           - 'rank'  : rank values, 1 for the poorest value,..., ascending.
-%           - 'rank10': rank values, 1 for the poorest value, other
-%                       are less than 1 (suitable for rank aggregation)
-%           - empty or 'none': do not unify
-% .........................................................................
-%   reduceMethod:
-%           which method for feature reduction to use (to eliminate
-%           non-informative indices):
+%   indicesList
+%       A cell containing one or more cluster validity indices:
 %
-%           - 'NONE' : do not use any (default)
-%           ----------------------- selection -----------------------------
-%           - 'FSFS' (Mitra et al., 2002)
-%           - 'LS'   (Laplacian Score by He et al., 2005)
-%           - 'SPEC' (Spectral feature selection, Zhao & Liu 2007)
-%           - 'FSKM' (feature selection with k-medoids, Pepelka 2014)
-%           ---------------- extraction/transformation --------------------
+%       Legend:
+%       ID (Method name)[Best] Parameters
+%
+%       Optionally, you can use multiple methods, i.e., {'DN','SIL','WR'}.
+%       If empty, none of them is calculated.
+%
+%       - 'APN' (Avg. proportion of non-overlap)[min] clMethod | labelsDel
+%       - 'AD' (Average distance)[min] clMethod | labelsDel
+%       - 'ADM' (Average distance between means)[min] clMethod | labelsDel
+%       - 'BHI' (Biological homogeneity index)[max] genenames, annotations,
+%         GO_aspect, GO_evidence
+%       - 'BSI' (Biological stability index)[max] same as BHI
+%       - 'CH' (Calinski-Harabasz) [max]
+%       - 'CI' (C-index) [min]
+%       - 'CON' (Connectivity index) [min] CON_L
+%       - 'DB' (Davies-Bouldin index) [min] DB_p, DB_q
+%       - 'DB*' (modified Davies-Bouldin index) [min]
+%       - 'DN' (Dunn index) [max]
+%       - 'DNG' (Dunn index using graphs) [max]
+%       - 'DNS' (Modified Dunn index) [max]
+%       - 'FOM' (Figure of merit)[min] clMethod | labelsDel
+%       - 'GAMMA' (Gamma index)[min]
+%       - 'GDI' (Generalized Dunn Indices (18))[max] GDI_interdist, 
+%         GDI_intradist
+%       - 'GPLUS' (G(+) index)[max]
+%       - 'HOM' (Homogeneity (average))[max]
+%       - 'HOMMIN' (Homogeneity (minimum))[max]
+%       - 'I' (I-index or PBM)[max]
+%       - 'SD' (SD index)[min] SD_alpha
+%       - 'SDBW' (S_Dbw index)[min]
+%       - 'SEP' (Separation (average))[min]
+%       - 'SEPMAX' (Separation (maximum))[min]
+%       - 'SF' (Score Function)[max]
+%       - 'SIL' (Silhouette index (average))[max]
+%       - 'SSI' (Simple Structure Index)[max]
+%       - 'TAU' (Tau index)[min]
+%       - 'VAR' (Variance index)[min]
+%       - 'XB' (Xie-Beni index)[min]
+%       - 'XB*' (Modified Xie-Beni index)[min]
+%
+%   unifyMethod
+%       Which unification method to use:
+%           'minmax'
+%               max-like: value_i/max, min-like: min/value_i.
+%           'range' 
+%               Normalize on [0,1].
+%           'range0'
+%               Move range to start with 0.
+%           'range1'
+%               Move range to end with 1.
+%           'pos'   
+%               Move indeces with negative values to start with 0.
+%           'prob'
+%               Transform to probabilities, sum is 1.
+%           'rank'
+%               Rank values, 1 for the poorest value,..., ascending.
+%           'rank10'
+%               Rank values, 1 for the poorest value, other are less 
+%               than 1 (suitable for rank aggregation).
+%           empty or 'none'
+%               Do not unify.
+%
+%   reduceMethod
+%       Which method for feature reduction to use (to eliminate 
+%       non-informative indices):
+%
+%           - 'NONE'
+%               Do not use any (default).
+%
+%           selection
+%           - 'FSFS' 
+%               Mitra et al., 2002.
+%           - 'LS'   
+%               Laplacian Score by He et al., 2005.
+%           - 'SPEC' 
+%               Spectral feature selection, Zhao & Liu 2007.
+%           - 'FSKM'
+%               Feature selection with k-medoids, Pepelka 2014.
+%
+%           extraction/transformation
 %           - 'PCA'
-%           - 'KPCA' (Scholkopf et al., 1998)
-%           - 'ICA'  (FastICA by Hyravinen et al., 2000)
+%           - 'KPCA' 
+%               Scholkopf et al., 1998.
+%           - 'ICA'  
+%               FastICA by Hyravinen et al., 2000.
 %           - any of supported methods in the Dimensionality reduction
 %             toolbox (by van der Maaten).
-%             Unsupervised:
-% 			    'ProbPCA', 'MDS', 'FactorAnalysis',  'Isomap', 'Laplacian',
-% 			    'HessianLLE', 'LTSA','FastMVU', 'DiffusionMaps', 'SNE',
-% 			    'SymSNE', 'tSNE', 'SPE', 'Autoencoder'
+%             Unsupervised (prefered):
+%               'ProbPCA', 'MDS', 'FactorAnalysis',  'Isomap', 'Laplacian',
+%               'HessianLLE', 'LTSA','FastMVU', 'DiffusionMaps', 'SNE',
+%               'SymSNE', 'tSNE', 'SPE', 'Autoencoder'
 %             Unsupervised (occasional singularity problem on PRM data)
-% 			    'GPLVM', 'Sammon', 'LandmarkIsomap', 'LLE', 'MVU', 'CCA',
-% 			    'LandmarkMVU', 'LPP', 'NPE', 'LLTSA', 'LLC',
-% 			    'ManifoldChart', 'CFA'
+%               'GPLVM', 'Sammon', 'LandmarkIsomap', 'LLE', 'MVU', 'CCA',
+%               'LandmarkMVU', 'LPP', 'NPE', 'LLTSA', 'LLC',
+%               'ManifoldChart', 'CFA'
 %             Supervised / labeled
-% 			    'LDA', 'GDA', 'NCA', 'MCML', 'LMNN'
-%           - 'FEKM' (feature extraction with k-means, Pepelka 2014)
-% .........................................................................
-%   weightMethod, weigthMode :
-%           which weighting method to use. You can choose among these:
-%           methods are in (), their possible modes in []
-%           - mean ('wMean')
-%           - minimum ('wMin')
-%           - maximum ('wMax')
-%           - difference ('wDiff')
-%           - Vega-Pons et al. 2010 ('wVegaPons')['CLK'|'CBK']
-%           - rank aggregation ('wRankAggreg')
-%                     ['min'|'mean'|'median'|'geom.mean'|'stuart'|'RRA']
+%               'LDA', 'GDA', 'NCA', 'MCML', 'LMNN'
+%           - 'FEKM' 
+%               Feature extraction with k-means, Pepelka 2014.
 %
+%   weightMethod, weigthMode
+%       Which weighting method to use. You can choose among these:
+%       
+%       Legend:
+%       Methods are in (), their possible modes in [].
 %
-%   options.reduceDim : number of reduced dimensions or name of estimator (passed to pplk_featureReduce())
-%   options.CVImat: a matrix [ensembleSize,numIndices] with pre-computed indices values  
-%   options.dtype : distance measure type:
-%                      1 - Euclidean distance or
-%                      2 - Pearson correlation
-%   options.NC    : vector that contains numbers of clusters, e.g., [2 3 4 5]
-%                   length(NC) and number of labels sets in labels must
-%                   match.
+%       - mean ('wMean')
+%       - minimum ('wMin')
+%       - maximum ('wMax')
+%       - difference ('wDiff')
+%       - Vega-Pons et al. 2010 ('wVegaPons')['CLK'|'CBK']
+%       - rank aggregation ('wRankAggreg')
+%       ['min'|'mean'|'median'|'geom.mean'|'stuart'|'RRA']
+%
+%   options.reduceDim 
+%       Number of reduced dimensions or name of estimator (passed to 
+%       pplk_featureReduce()).
+%
+%   options.CVImat
+%       An ensembleSize-by-numIndices matrix with pre-computed indices 
+%       values.  
+%
+%   options.dtype
+%       Distance measure type:
+%           1 - Euclidean distance
+%           2 - Pearson correlation
+%
+%   options.NC 
+%       Vector that contains numbers of clusters, e.g., [2 3 4 5]
+%       length(NC) and number of labels sets in labels must match.
 %
 %	For other options, please see the help of pplk_validInt function.
 %
-% OUTPUTS
-%	weigths  : vector of weights for each partition in ensemble
-%	PRM      : Partition Relevance Matrix [ensembleSize X numOfIndices]
-%   featInd  : indices of the remaining features, if selection step occured
 %
-%--------------------------------------------------------------------------
-% File is a part of the Pepelka package.
-% (C) Nejc Ilc (nejc.ilc@fri.uni-lj.si)
-% Last modification: 22-August-2013
-%--------------------------------------------------------------------------
+% OUTPUTS
+%   weigths
+%       Vector of weights for each partition in ensemble.
+%
+%   PRM
+%       An ensembleSize-by-numOfIndices Partition Relevance Matrix.
+%
+%   featInd
+%       Indices of the remaining features, if selection step occured.
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 
 callDir=chdir(pplk_homeDir());
 

@@ -1,58 +1,71 @@
 function [labels, moreInfo]=pplk_runClustererDel(methodName,data,K,nRuns,params)
-% PPLK_RUNCLUSTERERDEL
-% Run single clustering algorithm with data columns deletion.
 % [labels,moreInfo] = pplk_runClustererDel(methodName,data,K,nRuns,params)
-% -------------------------------------------------------------------------
+% Run single clustering algorithm with data columns deletion.
+%
 % INPUTS
-%   methodName  (string)  abbreviated name of clustering algorithm
-%   data        (matrix)  input data, size of [N x D]
-%               (string)  filename or name of data in the datasets folder
-%   K           (int)     desired number of clusters
-%   nRuns       (int)     number of runs of method
-%   params      (struct)  optional structure with fields containing required
-%                         parameter's value. Leave out for defaults;
+%   methodName
+%       Abbreviated name of clustering algorithm.
+%
+%   data
+%       - A N-by-D matrix of input data.
+%       - A filename or name of data in the datasets folder.
+%
+%   K
+%       Desired number of clusters.
+%
+%   nRuns   
+%       Number of runs of method.
+%
+%   params
+%       Optional structure with fields containing required parameter's
+%       value. Leave out for defaults.
+%
 %
 % OUTPUTS
-%   labels      (vector)  vector of data labels - clustering
-%   moreInfo    (cell)    other info from clusterer (time, etc.)
+%   labels
+%       A vector of data labels - clustering.
+%
+%   moreInfo    
+%       A cell of other info from clusterer (time, etc.).
 %
 %
-% DESCRIPTION
+% DETAILS on inputs 'methods' and 'params'
+%
 %   Cluster data into K clusters with column deletion. Repeat clustering
 %   D-times (D is number of features) and on each step skip one column of
 %   data (on i-th step delete i-th column of data).
 %
-%   List of available methods with associated parameters:
-%   --------------+-----------------------------------------+--------------
-%   methodName    | params.methodName_                      | Description
-%   --------------+-----------------------------------------+--------------
-%   AL            | distance*                               | Average-linkage
-%   CLUSOT        | cluster_method,msize**, shape, res,     | Clusot: SOM+RF/GB
-%                 | theta, theta0 / g                       |
-%   CS            | sigma**, Kin, Nin                       | Cauchy-Schwarz divergence
-%   EM            | /                                       | Expectation Maximization
-%   FCM           | /                                       | Fuzzy C-means
-%   GSOM          | G,dG,alfa,maxIter, pOut, msize**, shape | Gravitational SOM
-%                 | distance, showSOM, showGrav, advanced   |
-%   HCL           | clustMethod, distance                   | Hierarchical Clustering (general, including AL,SL,WL and few others)
-%   SOMKM         | nRuns, msize**, shape                   | K-means on the SOM
-%   KCC           | /                                       | K-centers
-%   KM            | maxIter, nRuns, distance                | K-means
-%   KVV           | sigma*                                  | Kannan, Vempala and Vetta spectral
-%   NC            | /                                       | Normalized cuts
-%   NJW           | sigma*                                  | Ng, Jordan and Weiss spectral
-%   RANDOM        | /                                       | random partition
-%   SL            | distance*                               | Single-linkage
-%   SPECLS        | Knn, mode                               | Spectral local scaling
-%   WL            | distance*                               | Ward-linkage
-%  ---------------+-----------------------------------------+--------------
+% List of available methods with associated parameters:
+%   Legend:
+%   methodName (params.methodName_[val]) Description
 %   *  can not-exists
 %   ** can be []
 %
-% -------------------------------------------------------------------------
-% Last modification: 27. September 2013
-% (C) Pepelka Package, Nejc Ilc (nejc.ilc@fri.uni-lj.si)
-% -------------------------------------------------------------------------
+%   - AL (distance*) Average-linkage.
+%   - CLUSOT (cluster_method,msize**, shape, res, theta, theta0 / g) 
+%     Clusot: SOM+RF/GB
+%   - CS (sigma**, Kin, Nin ) Cauchy-Schwarz divergence.
+%   - EM (/) Expectation Maximization.
+%   - FCM (/) Fuzzy C-means.
+%   - GSOM (G,dG,alfa,maxIter, pOut, msize**, shape, distance, showSOM, 
+%     showGrav, advanced) Gravitational SOM.        
+%   - HCL (clustMethod, distance) Hierarchical Clustering (general,
+%     including AL,SL,WL and few others)
+%   - SOMKM (nRuns, msize**, shape) K-means on the SOM.
+%   - KCC (/) K-centers.
+%   - KM (maxIter, nRuns, distance) K-means.
+%   - KVV (sigma*) Kannan, Vempala and Vetta spectral   
+%   - NC (/) Normalized cuts.      
+%   - NJW (sigma*) Ng, Jordan and Weiss spectral.
+%   - RANDOM (/) Random partition.
+%   - SL (distance*) Single-linkage.
+%   - SPECLS (Knn, mode) Spectral local scaling.
+%   - WL (distance*) Ward-linkage 
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 
 callDir=chdir(pplk_homeDir());
 

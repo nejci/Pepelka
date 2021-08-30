@@ -1,5 +1,4 @@
 function sD = pplk_normalize(sD,method,comps)
-
 %based on: SOM_NORMALIZE (Re)normalize data or add new normalizations.
 %
 % sS = som_normalize(sS,[method],[comps])

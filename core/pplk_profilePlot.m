@@ -1,35 +1,39 @@
 function [fig]=pplk_profilePlot(data,labels,K,varargin)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            CORE                                        
-%------------------------------------------------------------------------
-%                          Module III                                    
-%                      CLUSTER VALIDATION                                       
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FUNCTION:		pplk_profilePlot 
-% INPUTS:		data			(matrix)	input data, size of [N x D]
-%				labels			(vector)	clustering
-%				options			(name-value list) or (struct)
-%					Fields:
-%						figTitle
-%						axisLabels (1x2 cell of strings)
-%						axisTicks (1x2 cell of vectors)
-%						axisTicksLabels {1x2 cell of string 1xD cells}
-%						view ['overview'|'scatterPlot'|'details'|'PCA']
-%						colorMode ['color'|'pattern'|'mixed'|'mixedClear'] (only for scatterPlot)
-%						normalize [0|1] - (scatterPlot) normalize on interval [0,1]
-%						fig - force this figure handle
-%						annotations (n x 1) cell of strings, where n is number of data points
-%						centroids (scalar) [0 | 1] - plot cluster centroid or not 
+% [fig]=pplk_profilePlot(data,labels,K,varargin)
 %
-% OUTPUTS:		fig				(handle)	(array of) handle(s) on figure(s)
-%				
+% INPUTS		
+%   data
+%       A N-by-D matrix of input data.
+%
+%   labels
+%       A vector of data labels - clustering.
+%
+%   options			
+%       Options structure or name-value list.
+%       It's fields are:
+%           - figTitle
+%           - axisLabels a 1-by-2 cell of strings
+%           - axisTicks a 1-by-2 cell of vectors
+%           - axisTicksLabels a 1-by-2 cell of string 1-by-D cells
+%           - view ['overview'|'scatterPlot'|'details'|'PCA']
+%           - colorMode ['color'|'pattern'|'mixed'|'mixedClear'] 
+%             (only for scatterPlot)
+%           - normalize - (scatterPlot) normalize on interval [0,1]
+%           - fig - force this figure handle
+%           - annotations a n-by-1 cell of strings, where n is the number 
+%             of data points
+%           - centroids [0 | 1] - plot cluster centroid or not 
 %
 %
+% OUTPUTS	
+%   fig
+%       - A handle on figure.
+%       - An array of handles on figures.
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Last modification: 17.2.2012 
-% (C) Pepelka Package, Nejc Ilc (name.surname@fri.uni-lj.si)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 
 callDir=chdir(pplk_homeDir());
 

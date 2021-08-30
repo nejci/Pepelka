@@ -1,39 +1,59 @@
 function [fig,data] = pplk_scatterPlot(data,labels,K,options)
 % [fig,data]=PPLK_SCATTERPLOT(data,labels,K,options)
-% DESCRIPTION:	Function plots a scatter plot of data and clustering results
-% performed on data resultng in a labels vector.
+% Function plots a scatter plot of data and clustering results performed on
+% data resultng in a labels vector.
 %
-% INPUTS:		
-%   data	(matrix)	input data, size of [N x D]
-%	labels	(vector)	clustering
-%			(matrix)	set of clusterings - plot them on the subfigure
-%	K		(int)		(optional) number of clusters; if [] or
-%                       non-existent, K becomes the number of unique labels
-%	options	(struct)	options structure; can be [] or non-existent for
-%                       defaults;
-%						Fields:
-%                         .title (main title)
-%                         .subtitle (cell of strings - one string for each subplot)
-%                         .axisLabels (1x2 cell of strings)
-%                         .axisTicks (1x2 cell of vectors)
-%                         .axisStyle (string, eg. 'square', 'equal', 'tight')
-%                         .colorMode ['color'|'pattern'|'mixed']
-%                         .normalize [0|1] - normalize on interval [0,1]
-%                         .fig - force this figure handle
-%                         .annotations (n x 1) cell of strings,
-%                                       where n is number of data points
-%                         .markerSize (int) size of the marker
-%                         .interpreterMode (string) 'tex','latex',['none']
+% INPUTS		
+%   data
+%       A N-by-D matrix of input data.
 %
-% OUTPUTS:		
-%   fig		(handle)	handle on figure
-%   data    (matrix)    processed data displayed on graph (normalized, PCA
-%                       transformed if required)
+%   labels
+%       - A vector of data labels - clustering.
+%       - A matrix set of clusterings - plot them on the subfigure.
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Last modification: 20.11.2013
-% (C) 2013, Nejc Ilc (nejc.ilc@fri.uni-lj.si)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   K		
+%       Number of clusters; if [] or non-existent, K becomes the number of 
+%       unique labels.
+%
+%   options	
+%       Options structure; can be [] or non-existent for defaults.
+%       Fields:
+%           .title 
+%               Main title.
+%           .subtitle 
+%               Cell of strings - one string for each subplot.
+%           .axisLabels 
+%               1-by-2 cell of strings.
+%           .axisTicks 
+%               1-by-2 cell of vectors.
+%           .axisStyle 
+%               String, eg. 'square', 'equal', 'tight'.
+%           .colorMode 
+%               ['color'|'pattern'|'mixed'].
+%           .normalize 
+%               Normalize on interval [0,1].
+%           .fig 
+%               Force this figure handle.
+%           .annotations 
+%               n-by-1 cell of strings, where n is number of data points.
+%           .markerSize
+%               Size of the marker.
+%           .interpreterMode 
+%               'tex','latex',['none'].
+%
+%
+% OUTPUTS		
+%   fig	
+%       Handle on figure.
+%
+%   data
+%       Matrix of processed data displayed on graph (normalized, PCA 
+%       transformed if required).
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 
 [N,D]=size(data);
 

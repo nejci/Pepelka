@@ -1,30 +1,34 @@
 function [data,labelsT,info] = pplk_loadData(datasetName)
-% PPLK_LOADDATA
 % [data,labelsT,info] = pplk_loadData(datasetName)
-% INPUTS       
-%   datasetName  (string)  filename in datasets folder
-%                (string)  name of dataset (file is
-%                          selected by matching in reference table)
-%                (int)     ID of dataset (backward compatibility)
-%                                      
-% OUTPUTS      
-%   data         (matrix)  data matrix [nPoints x nDimensions]
-%   labelsT      (vector)  true labels [nPoints x 1] stored in
-%                          '..\datasets\dataNameT.mat' 
+% Function loads data matrix from the file dataName.mat and stores its
+% content into variable named 'data'. If file dataNameT.mat exists, its
+% content are loaded into 'labelsT' variable, otherwise the latter becomes
+% an empty vector [].
 %
-% DESCRIPTION	
-%   function loads data matrix from the file dataName.mat and stores its
-%   content into variable named 'data'. If file dataNameT.mat exists, its
-%   content is loaded into 'labelsT' variable, otherwise the latter becomes
-%   empty vector [].
+% INPUTS       
+%   datasetName
+%       - Filename in datasets folder.
+%       - Name of dataset (file is selected by matching in reference table).
+%       - ID number of dataset (backward compatibility).
+%
+%
+% OUTPUTS      
+%   data
+%       A nPoints-by-nDimensions data matrix.
+%
+%   labelsT      
+%       A nPoints-by-1 true labels vector stored in 
+%       '..\datasets\dataNameT.mat' 
+%
 %
 % EXAMPLES
 %   [data,target,info] = pplk_loadData('real\UCI\iris');
 %   [data,target,info] = pplk_loadData('iris');
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Last modification: 12. December 2014
-% (C) Pepelka Package, Nejc Ilc (nejc.ilc@fri.uni-lj.si)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 
 callDir=chdir(pplk_homeDir());
 

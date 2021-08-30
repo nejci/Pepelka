@@ -1,15 +1,31 @@
 function S = pplk_dist2sim(D,method,isGraph,sigma,order)
-% Converts distance matrix D to similarity matrix S, using transformation
-% method: 
-%   'lin' - linear, normalized 
-%   'lin2' - linear, normalized, max=1, min sim. = min. dist
-%   'ncut' - as defined by authors of Normalized Cuts algorithm. S = exp(-(D./sigma).^order) 
-%   'gauss' - gaussian; sigma is half of range if not otherwise defined! 
-%   'gauss2' - quasi gaussian, normalized, without sigma
-%   'gauss3' - quasi gaussian, without sigma
+% S = pplk_dist2sim(D,method,isGraph,sigma,order)
+% Converts distance matrix D to similarity matrix S, using transformation.
 %
-% isGraph: if D is distance matrix of graph, set this to 1 to ensure 
-%          zero entries remain zero!
+% INPUTS
+% method 
+%   'lin'
+%       Linear, normalized. 
+%   'lin2'
+%       Linear, normalized, max=1, min sim. = min. dist.
+%   'ncut'
+%       As defined by authors of Normalized Cuts algorithm. 
+%       S = exp(-(D./sigma).^order). 
+%   'gauss'
+%       Gaussian; sigma is half of range if not otherwise defined! 
+%   'gauss2'
+%       Quasi gaussian, normalized, without sigma.
+%   'gauss3'
+%       Quasi gaussian, without sigma.
+%
+% isGraph
+%   If D is distance matrix of graph, set this to 1 to ensure zero entries
+%   remain zero!
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 
 if ~exist('method','var') || isempty(method), method='lin'; end
 if ~exist('isGraph','var') || isempty(isGraph), isGraph=0; end

@@ -1,18 +1,18 @@
 function [fig] = pplk_validPlot(validResults, numClust, validMethods)
 
-% validResults  (struct)    structure with index name as field name and
-%                           index values as its content (numeric vector)
+% validResults
+%       - Structure with index name as field name and index values as its
+%         content (numeric vector).
+%       - A numValidMethods-by-length(numClust) matrix with values of 
+%         indeces in rows.
 %
-%               (matrix)    [numValidMethods X length(numClust)] matrix
-%                           with values of indeces in rows
+% numClust
+%       A vector of integers; for each index value (columns of
+%       validResults) it gives the number of clusters.
 %
-% numClust      (vector)    vector of integers; for each index value 
-%                           (columns of validResults) it gives the number
-%                           of clusters
-%
-% validMethods  (cell)      if validResults is a matrix, user must specify
-%                           used validation methods in this argument 
-%                           as cell of strings.
+% validMethods      
+%       If validResults is a matrix, user must specify used validation
+%       methods in this argument as cell of strings.
 %
 
 numClust_len=length(numClust);

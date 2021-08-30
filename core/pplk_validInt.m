@@ -1,164 +1,206 @@
 function [validInt, list] = pplk_validInt(data, labels, methods, options)
-% PPLK_VALIDINT 
 % [validInt, list] = PPLK_VALIDINT(data, labels, methods, options) 
 % Internal validity indices for estimating clustering quality and
 % number of clusters.
-%--------------------------------------------------------------------------
+%
 % INPUTS
-%   data		: data that were clustered [nPatterns x nDimensions]
+%   data
+%       A nPatterns-by-nDimensions matrix of data that were clustered.
 %
-%   labels      : labels of data, result of a clustering task
-%                 can be vector [nPatterns x 1] or matrix of labels [nPatterns x nNCs]
+%   labels
+%       Labels of data, result of a clustering task can be nPatterns-by-1
+%       vector or nPatterns-by-nNCs matrix of labels.
 %
-%   methods     : a cell containing one or more method's identifier.
-%                 You can use multiple methods, i.e., {'DN','SIL','WR'}.
-%                 If methods=[], all of them are computed.
+%   methods
+%       A cell containing one or more method's identifier. You can use
+%       multiple methods, i.e., {'DN','SIL','WR'}. If methods=[], all of
+%       them are computed.
 %
-% Note: indices that are designed ONLY for estimating number of clusters
-% are indicated with *
+%       Legend:
+%       ID (Method name)[Optimum] Reference
 %
-%  ID       Method name                     Optimum	Reference
-% -------------------------------------------------------------------------
-% 'APN'     Avg. proportion of non-overlap  min     Datta & Datta, 2003
-% 'AD'      Average distance                min     Datta & Datta, 2003
-% 'ADM'     Average distance between means  min     Datta & Datta, 2003
-% 'BHI'     Biological homogeneity index    max     Datta & Datta, 2006
-% 'BSI'     Biological stability index      max     Datta & Datta, 2006
-% 'CH'      Calinski-Harabasz               max     Calinski & Harabasz, 1974
-% 'CI'      C-index                         min     Hubert & Levin, 1976
-% 'CON'     Connectivity index              min     Handl & Knowles, 2005
-% 'DB'      Davies-Bouldin index            min     Davies & Bouldin, 1979
-% 'DBMOD'   modified Davies-Bouldin index   min     Kim & Ramakrishna, 2005
-% 'DN'      Dunn index                      max     Dunn, 1973
-% 'DNG'     Dunn index using graphs         max     Pal & Biswas, 1997
-% 'DNS'     modified Dunn index             max     Ilc, 2012
-% 'FOM'     Figure of merit                 min     Yeung et al., 2001
-% 'GAMMA'   Gamma index                     min     Baker & Hubert, 1975
-% 'GDI_ij'  Generalized Dunn Indices (18)   max     Bezdek & Pal, 1998
-% 'GPLUS'   G(+) index                      max     Rohlf, 1974
-% 'HA' *    Hartigan index                  elbow   Hartigan, 1985
-% 'HOM'     Homogeneity (average)           max     Sharan et al., 2003
-% 'HOMMIN'  Homogeneity (minimum)           max     Sharan et al., 2003
-% 'I'       I-index or PBM                  max     Maulik & Bandyopadhyay, 2002
-% 'KL' *    Krzanowski-Lai index            max     Krzanowski & Lai, 1988
-% 'SD' *    SD index                        min     Halkidi et al., 2000
-% 'SDBW'    S_Dbw index                     min     Halkidi & Vazirgiannis, 2001
-% 'SEP'     Separation (average)            min     Sharan et al., 2003
-% 'SEPMAX'  Separation (maximum)            min     Sharan et al., 2003
-% 'SF'      Score Function                  max     Saitta et al., 2008
-% 'SIL'     Silhouette index (average)      max     Rousseeuw, 1987
-% 'SSI'     Simple Structure Index          max     Dolnicar et al., 1999
-% 'TAU'     Tau index                       min     Rohlf, 1974
-% 'VAR'     Variance index                  min     Handl & Knowles, 2005b
-% 'WR' *    Weighted inter-intra index      drop    Strehl, 2002
-% 'WRP'*    Penalized WR index              drop    Strehl, 2002
-% 'XB'      Xie-Beni index                  min     Xie & Beni, 1991
-% 'XBMOD'   modified Xie-Beni index         min     Kim & Ramakrishna, 2005
-% -------------------------------------------------------------------------
+%       Indices that are designed ONLY for estimating number of clusters
+%       are indicated with *.
 %
-%   options.dtype: distance measure type (not all of the indices consider this):
-%                      1 - Euclidean distance or
-%                      2 - Pearson correlation or
-%                      any other string identifier that is passed to pdist
+%       'APN' (Avg. proportion of non-overlap)[min] Datta & Datta, 2003
+%       'AD'  (Average distance)[min] Datta & Datta, 2003
+%       'ADM' (Average distance between means)[min] Datta & Datta, 2003
+%       'BHI' (Biological homogeneity index)[max] Datta & Datta, 2006
+%       'BSI' (Biological stability index)[max] Datta & Datta, 2006
+%       'CH'  (Calinski-Harabasz)[max] Calinski & Harabasz, 1974
+%       'CI'  (C-index)[min] Hubert & Levin, 1976
+%       'CON' (Connectivity index)[min] Handl & Knowles, 2005
+%       'DB'  (Davies-Bouldin index)[min] Davies & Bouldin, 1979
+%       'DBMOD' (Modified Davies-Bouldin index)[min] Kim & Ramakrishna, 2005
+%       'DN' (Dunn index)[max] Dunn, 1973
+%       'DNG' (Dunn index using graphs)[max] Pal & Biswas, 1997
+%       'DNS' (Modified Dunn index)[max] Ilc, 2012
+%       'FOM' (Figure of merit)[min] Yeung et al., 2001
+%       'GAMMA' (Gamma index)[min] Baker & Hubert, 1975
+%       'GDI_ij' (Generalized Dunn Indices (18))[max] Bezdek & Pal, 1998
+%       'GPLUS' (G(+) index)[max] Rohlf, 1974
+%       'HA' * (Hartigan index)[elbow] Hartigan, 1985
+%       'HOM' (Homogeneity (average))[max] Sharan et al., 2003
+%       'HOMMIN' (Homogeneity (minimum))[max] Sharan et al., 2003
+%       'I' (I-index or PBM)[max] Maulik & Bandyopadhyay, 2002
+%       'KL' * (Krzanowski-Lai index)[max] Krzanowski & Lai, 1988
+%       'SD' * (SD index)[min] Halkidi et al., 2000
+%       'SDBW' (S_Dbw index)[min] Halkidi & Vazirgiannis, 2001
+%       'SEP' (Separation (average))[min] Sharan et al., 2003
+%       'SEPMAX' (Separation (maximum))[min] Sharan et al., 2003
+%       'SF' (Score Function)[max] Saitta et al., 2008
+%       'SIL' (Silhouette index (average))[max] Rousseeuw, 1987
+%       'SSI' (Simple Structure Index)[max] Dolnicar et al., 1999
+%       'TAU' (Tau index)[min] Rohlf, 1974
+%       'VAR' (Variance index)[min] Handl & Knowles, 2005b
+%       'WR' * (Weighted inter-intra index)[drop] Strehl, 2002
+%       'WRP'* (Penalized WR index)[drop] Strehl, 2002
+%       'XB' (Xie-Beni index)[min] Xie & Beni, 1991
+%       'XBMOD' (Modified Xie-Beni index)[min] Kim & Ramakrishna, 2005
+% 
+%   options.dtype
+%       Distance measure type (not all of the indices consider this):
+%       1 - Euclidean distance
+%       2 - Pearson correlation 
+%       Any other string identifier that is passed to pdist.
 %
-%   options.NC  : vector that contains numbers of clusters, e.g., [2 3 4 5]
-%                 length(NC) and number of labels sets in labels must
-%                 match.
-%   options.distMat: precomputed distance matrix
-%	options.CON_L : number of nearest neighbors considered when calculating
-%					CON index. If empty, default value of 5 is taken.
+%   options.NC
+%       Vector that contains numbers of clusters, e.g., [2 3 4 5]
+%       length(NC) and number of labels sets in labels must match.
 %
-%   options.DB_p : parameter of the Minkowski distance
-%                           p = 1: cityblock distance
-%                           p = 2: Euclidean distance (default)
-%   options.DB_q : parameter of dispersion measure of a cluster
-%                           q = 1: average Euclidean measure (default)
-%                           q = 2: standard deviation of the distance
+%   options.distMat
+%       Precomputed distance matrix.
 %
-%   options.GDI_interdist : (string/int) distance between two clusters
-%                               1 - 'single' (original Dunn)
-%                               2 - 'complete'
-%                               3 - 'average'
-%                               4 - 'centroid'
-%                               5 - 'avg2cent'
-%                               6 - 'hausdorff'
-%                               - if empty, compute all of them
-%   options.GDI_intradist : (string/int) cluster diameter:
-%                               1 - 'complete' (original Dunn)
-%                               2 - 'average'
-%                               3 - 'avg2cent'
-%                               - if empty, compute all of them
+%   options.CON_L
+%       Number of nearest neighbors considered when calculating CON index.
+%       If empty, default value of 5 is taken.
 %
-%   options.clMethod :  when using stability measures (APN, AD, ADM, BSI,
-%                       FOM), additional labels with deletion have to be
-%                       supplied; if not, they will be computed with method
-%                       clMethod. See pplk_runClustererDel for details.
+%   options.DB_p
+%       Parameter of the Minkowski distance
+%       p = 1: cityblock distance
+%       p = 2: Euclidean distance (default)
 %
-%   options.params :    parameters for clMethod
+%   options.DB_q
+%       Parameter of dispersion measure of a cluster.
+%       q = 1: average Euclidean measure (default)
+%       q = 2: standard deviation of the distance
 %
-%   options.labelsDel : matrix [n X d X nNCs] with clustering labels when
-%                       clustering data without one column. (i,j,k) contains
-%                       clustering label for data sample i without j-th feature
-%                       when clustering into NC(k) clusters.
-%                       Required by stability measures (APN, AD, ADM, BSI, FOM).
-%                       If not provided, labelsDel is computed with
-%                       options.clMethod using options.params.
+%   options.GDI_interdist
+%       (string/int) distance between two clusters:
+%           1 - 'single' (original Dunn)
+%           2 - 'complete'
+%           3 - 'average'
+%           4 - 'centroid'
+%           5 - 'avg2cent'
+%           6 - 'hausdorff'
+%           - if empty, compute all of them
 %
-%   options.genenames : (required by BHI and BSI) cell of genenames, one
-%                                                 for each row in data
+%   options.GDI_intradist
+%       (string/int) cluster diameter:
+%           1 - 'complete' (original Dunn)
+%           2 - 'average'
+%           3 - 'avg2cent'
+%           - if empty, compute all of them
 %
-%   options.annotations : (required by BHI and BSI)
-%                         structure array with fields:
-%                         .geneID         (gene identifier, e.g., Affymetrix probe ID)
-%                         .functionID     (functional class identifier, e.g., GO ID)
-%                         .aspect         (optional - when used with GO)
-%                         .evidence       (optional - when used with GO)
-%   options.GO_aspect : (required by BHI and BSI) which aspects to include:
-%                               'BP' | 'CC' | 'MF' (or any subset of them);
-%                               leave empty to compute all of them.
-%   options.GO_evidence : (required by BHI and BSI) which evidence to ignore,
-%                               i.e.: 'EXP', 'IDA', 'IEA',... or any subset;
-%                               leave empty to compute all of them.
-%   options.SD_alpha : (required by SD) weighting factor (should equals
-%                      Dis(labels(:,cmax)), where cmax is the maximum
-%                      number of input clusters). If empty set to number of
-%                      clusters in labels.
-%   options.SHOW :  logical, whether to plot indices (1) or not (0, default)
+%   options.clMethod
+%       when using stability measures (APN, AD, ADM, BSI, FOM), additional
+%       labels with deletion have to be supplied; if not, they will be
+%       computed with method clMethod. See pplk_runClustererDel for
+%       details.
 %
-%   options.graph : already built graph on data for DNS and DNG
-%   options.graphShortPaths: already computed all shortest paths in graph
-%   options.graph_type: type of a graph for DNS, DNG; default: 'gabriel'
-%   options.uniqueInd : indeces of unique data points, required by DNs and
-%                       DNg
-%   options.graph_sqEucl: if weights of a graph are squared Euclidean
-%                         distances, default 0
-%   options.penalFun: penal function for increasing K (only for DNS) 
-%                     ['none', 'reciproc', 'exponent', default: 'logistic']
-%   options.penalFunP: strength of penals [0,1], 0: no penal, 1: full penal
-%   options.penalFunLogMid : mid-point for logistic function, 
-%                            default ceil(sqrt(N)/2)
+%   options.params
+%       Parameters for clMethod.
+%
+%   options.labelsDel
+%       A n-by-d-by-nNCs matrix with clustering labels when clustering data
+%       without one column. (i,j,k) contains clustering label for data
+%       sample i without j-th feature when clustering into NC(k) clusters.
+%       Required by stability measures (APN, AD, ADM, BSI, FOM). If not
+%       provided, labelsDel is computed with options.clMethod using
+%       options.params.
+%
+%   options.genenames
+%       (required by BHI and BSI) cell of genenames, one for each row in 
+%       data.
+%
+%   options.annotations
+%       (required by BHI and BSI) structure array with fields:
+%           .geneID         
+%               Gene identifier, e.g., Affymetrix probe ID.
+%           .functionID     
+%               Functional class identifier, e.g., GO ID.
+%           .aspect         
+%               Optional - when used with GO.
+%           .evidence       
+%               Optional - when used with GO.
+%
+%   options.GO_aspect
+%       (required by BHI and BSI) which aspects to include:
+%       'BP' | 'CC' | 'MF' (or any subset of them);
+%       leave empty to compute all of them.
+%
+%   options.GO_evidence
+%       (required by BHI and BSI) which evidence to ignore,
+%       i.e.: 'EXP', 'IDA', 'IEA',... or any subset;
+%       leave empty to compute all of them.
+%
+%   options.SD_alpha
+%       (required by SD) weighting factor (should equals
+%       Dis(labels(:,cmax)), where cmax is the maximum number of input
+%       clusters). If empty set to number of clusters in labels.
+%
+%   options.SHOW
+%       Logical, whether to plot indices (1) or not (0, default).
+%
+%   options.graph
+%       Already built graph on data for DNS and DNG.
+%
+%   options.graphShortPaths
+%       Already computed all shortest paths in graph.
+%
+%   options.graph_type
+%       Type of a graph for DNS, DNG; default: 'gabriel'.
+%
+%   options.uniqueInd
+%       Indeces of unique data points, required by DNs and DNg.
+%
+%   options.graph_sqEucl
+%       If weights of a graph are squared Euclidean distances, default 0.
+%
+%   options.penalFun
+%       Penal function for increasing K (only for DNS) ['none', 'reciproc',
+%       'exponent', default: 'logistic'].
+%
+%   options.penalFunP
+%       Strength of penals [0,1], 0: no penal, 1: full penal.
+%
+%   options.penalFunLogMid
+%       Mid-point for logistic function, default ceil(sqrt(N)/2).
+%
 %
 % OUTPUTS
-%	validInt	: a struct with fields that are named according to the used
-%				  methods, i.e., DB if methods={'DB'}.
-%	list		: numeric matrix [nMethods X nClusterings] with values of indices
-%--------------------------------------------------------------------------
+%   validInt
+%       A struct with fields that are named according to the used methods
+%       i.e., DB if methods={'DB'}.
+%
+%   list
+%       Numeric nMethods-by-nClusterings matrix with values of indices.
+%
+%
 %   Requirements:
-%       MATLAB Statistics Toolbox 
+%       MATLAB Statistics Toolbox
 %       (Silhouette function, crosstab, nanmean, pdist, pdist2)
-%   Acknowledgements:
-%       Cluster Validity Analysis Platform (CVAP) (Version 3.4) 
+%
+%
+%   ACKNOWLEDGEMENTS AND REFERENCES
+%       Cluster Validity Analysis Platform (CVAP) (Version 3.4)
 %       Copyright (C) 2006-2007 by Kaijun Wang.
-%------- LEGAL NOTICE -----------------------------------------------------
-% Copyright (C) 2013,  Nejc Ilc
 %
-%------- VERSION ----------------------------------------------------------
-% Version: 1.3.0
-% Last modified: 09-April-2021 by Nejc Ilc
 %
-%------- CONTACT ----------------------------------------------------------
-% Please write to: Nejc Ilc <myName.mySurname@gmail.com>
-%==========================================================================
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
+
 
 
 callDir=chdir(pplk_homeDir());

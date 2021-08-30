@@ -1,44 +1,42 @@
 function [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,options)
-% pplk_validExt
 % [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,options)
+% External validity indices for comparing two partitions (e.g., comparing 
+% to ground truth).
 %
-% External validity indices for comparing two partitions
-% (e.g., comparing to ground truth).
+% INPUTS
+%   labelsT         
+%       Ground truth clustering.
 %
-%--------------------------------------------------------------------------
-% INPUTS:
-%   labelsT         : ground truth clustering
+%   labelsCons
+%       Clusterer's output = compared clustering.
 %
-%   labelsCons      : clusterer's output = compared clustering
+%   methods         
+%       Is a cell containing one or more method's identifier. If empty, all
+%       of them are included into result validExt.
 %
-%   methods         : is a cell containing one or more method's identifier.
-%                     If empty, all of them are included into result 
-%                     validExt.
+%       Legend:
+%       ID (Method Name) Additional notes
 %
-%   ID       METHOD NAME                        ADDITIONAL NOTES
-%--------------------------------------------------------------------------
-%  'RI'      Rand Index
-%  'ARI'     Adjusted Rand Index
-%  'JI'      Jaccard Index
-%  'FM'      Fowlkes and Mallows
-%  'CA'      Clustering Accuracy
-%  'BCA'     Balanced Clustering Accuracy
-%  'PDBCA'   Posterior Distribution 
-%            Balanced Clustering Accuracy
-%  'VOI'     Variation of information
-%  'ADCO'    Attribute Distribution              required options fields:
-%            Clustering Orthogonality            - options.data
-%                                                - options.bins
-%  'NMI'     Normalized Mutual Information       alias: 'NMISQRT'
-%  'NMIMAX'  MAX Normalized Mutual Information
-%  'AMI'     Adjusted Mutual Information         alias: 'AMIMAX'
-%  'VM'      V-measure
-%  'B3C'     B-Cubed measure (Clusters)          B-Cubed F-measure averaged
-%                                                over Clusters
-%  'B3E'     B-Cubed measure (Elements)          B-Cubed F-measure averaged
-%                                                over Elements
-%--------------------------------------------------------------------------
-% Acknowledgements:
+%       'RI' (Rand Index)
+%       'ARI' (Adjusted Rand Index)
+%       'JI' (Jaccard Index)
+%       'FM' (Fowlkes and Mallows)
+%       'CA' (Clustering Accuracy)
+%       'BCA' (Balanced Clustering Accuracy)
+%       'PDBCA' (Posterior Distribution Balanced Clustering Accuracy)
+%       'VOI' (Variation of information)
+%       'ADCO' (Attribute Distribution Clustering Orthogonality) Required 
+%       options fields: options.data, options.bins
+%       'NMI' (Normalized Mutual Information) alias: 'NMISQRT'
+%       'NMIMAX' (MAX Normalized Mutual Information)
+%       'AMI' (Adjusted Mutual Information) alias: 'AMIMAX'
+%       'VM' (V-measure)
+%       'B3C' (B-Cubed measure (Clusters)) B-Cubed F-measure averaged over
+%       Clusters
+%       'B3E' (B-Cubed measure (Elements)) B-Cubed F-measure averaged over
+%       Elements
+%
+% ACKNOWLEDGEMENTS AND REFERENCES
 % [1] Cluster Validity Analysis Platform (CVAP) (v3.4) 2006-2007 by Kaijun
 %     Wang. http://www.mathworks.com/matlabcentral/fileexchange/14620
 %
@@ -46,7 +44,11 @@ function [validExt,list,moreInfo] = pplk_validExt(labelsT,labelsCons,methods,opt
 %     Deepak Verma. http://www.stat.washington.edu/spectral/#code
 %
 % [3] Code for Adjusted Mutual Information (AMI_max), Nguyen Xuan Vinh
-%==========================================================================
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 
 callDir=chdir(pplk_homeDir());
 moreInfo = [];

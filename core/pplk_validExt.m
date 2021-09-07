@@ -118,7 +118,7 @@ methods = strrep(methods,'AMIMAX','AMI');
 
 %tle definu return argumente Aleks
 validExt = struct();
-list = zeros(numLabels,nMethods);
+list = zeros(nMethods,numLabels);
 for method = methods
     mchar = char(method(1));
     validExt.(mchar) = zeros(1,numLabels);
@@ -174,7 +174,7 @@ for curlabel=1:numLabels
                 % Clustering Methods,” Journal of the American Statistical
                 % Association, vol. 66, no. 336, pp. 846–850, 1971.
                 validExt.RI(curlabel) = R/ns;
-                list(curlabel, ind) = validExt.RI(curlabel);
+                list(ind, curlabel) = validExt.RI(curlabel);
 
             case 'ARI'
                 %============= Adjusted Rand index ============================
@@ -190,7 +190,7 @@ for curlabel=1:numLabels
                     ARI=(R-nc)/(ns-nc);
                 end
                 validExt.ARI(curlabel)=ARI;
-                list(curlabel, ind) = validExt.ARI(curlabel);
+                list(ind, curlabel) = validExt.ARI(curlabel);
 
             case 'JI'
                 %============= Jaccard index ==================================
@@ -200,7 +200,7 @@ for curlabel=1:numLabels
                 % Jain, A., Dubes, R.: Algorithms for Clustering Data.
                 % Prentice-Hall, Englewood Cliffs (1988)
                 validExt.JI(curlabel) = (sumC-n)/(sumij-sumC-n);
-                list(curlabel, ind) = validExt.JI(curlabel);
+                list(ind, curlabel) = validExt.JI(curlabel);
 
             case 'FM'
                 %============= Fowlkes and Mallows ============================
@@ -217,7 +217,7 @@ for curlabel=1:numLabels
                 nj = nj.*(nj-1)/2;
                 njs = sum(nj);
                 validExt.FM(curlabel) = 1 - 0.5*(sumC-n)/sqrt(nis*njs);
-                list(curlabel, ind) = validExt.FM(curlabel);
+                list(ind, curlabel) = validExt.FM(curlabel);
 
             case 'CA'
                 %============= Clustering Accuracy ============================
@@ -228,7 +228,7 @@ for curlabel=1:numLabels
                 % distance,” Journal of Multivariate Analysis, vol. 98, pp.
                 % 873–895, 2007.
                 validExt.CA(curlabel) = -hungarianCost/n;
-                list(curlabel, ind) = validExt.CA(curlabel);
+                list(ind, curlabel) = validExt.CA(curlabel);
 
             case 'BCA'
                 %============= Balanced Clustering Accuracy ===================
@@ -248,7 +248,7 @@ for curlabel=1:numLabels
                 % namesto size(Caligned,1) bi moralo biti stevilo
                 % razredov v labelsA
                 validExt.BCA(curlabel) = (1/numClustersTrue)*sum(a);
-                list(curlabel, ind) = validExt.BCA(curlabel);
+                list(ind, curlabel) = validExt.BCA(curlabel);
 
 
             case 'PDBCA'
@@ -292,7 +292,7 @@ for curlabel=1:numLabels
                 end
 
                 validExt.PDBCA(curlabel) = bmean;
-                list(curlabel, ind) = validExt.PDBCA(curlabel);
+                list(ind, curlabel) = validExt.PDBCA(curlabel);
 
                 chdir(oldPath);
 
@@ -307,7 +307,7 @@ for curlabel=1:numLabels
                 % 873–895, 2007.
                 VOI = 1 - (Hx + Hy - 2*MI)/log(length(labelsA));
                 validExt.VOI(curlabel) = VOI;
-                list(curlabel, ind) = validExt.VOI(curlabel);
+                list(ind, curlabel) = validExt.VOI(curlabel);
 
             case 'ADCO'
                 %===== Attribute Distribution Clustering Orthogonality ========
@@ -327,7 +327,7 @@ for curlabel=1:numLabels
                             %default value for bins is 10
                             validExt.ADCO(curlabel)=ADCO(options.data, labelsA, labelsB(:, curlabel),10);
                         end
-                        list(curlabel, ind) = validExt.ADCO(curlabel);
+                        list(ind, curlabel) = validExt.ADCO(curlabel);
                     else
                         disp('Warning: ADCO -> Missing options.data field! Ignoring ADCO!');
                     end
@@ -345,7 +345,7 @@ for curlabel=1:numLabels
                 % Journal of Machine Learning Research, vol. 3, pp. 583–617,
                 % 2003.
                 validExt.NMI(curlabel)=NMI;
-                list(curlabel, ind) = validExt.NMI(curlabel);
+                list(ind, curlabel) = validExt.NMI(curlabel);
 
             case 'NMIMAX'
                 %============ Normalized Mutual Information Max ===============
@@ -362,7 +362,7 @@ for curlabel=1:numLabels
                     NMIMAX = 0;
                 end
                 validExt.NMIMAX(curlabel)=NMIMAX;
-                list(curlabel, ind) = validExt.NMIMAX(curlabel);
+                list(ind, curlabel) = validExt.NMIMAX(curlabel);
 
             case 'AMI'
                 %============ Adjusted Mutual Information =====================
@@ -375,7 +375,7 @@ for curlabel=1:numLabels
                 % Learning Research, vol. 11, pp. 2837–2854, Dec. 2010.
                 AMI = ami(C,[],MI,Hx,Hy);
                 validExt.AMI(curlabel) = AMI;
-                list(curlabel, ind) = validExt.AMI(curlabel);
+                list(ind, curlabel) = validExt.AMI(curlabel);
 
             case 'VM'
                 %============= V-Measure ======================================
@@ -396,7 +396,7 @@ for curlabel=1:numLabels
 
                 oldPath=chdir(['..',filesep,'validation',filesep,'vmeasure']);
                 validExt.VM(curlabel) = vmeasure(C,beta);
-                list(curlabel, ind) = validExt.VM(curlabel);
+                list(ind, curlabel) = validExt.VM(curlabel);
                 chdir(oldPath);
 
             case 'B3C'
@@ -410,7 +410,7 @@ for curlabel=1:numLabels
                 % 1998, pp. 563–566.
                 oldPath=chdir(['..',filesep,'validation',filesep,'BCUBED']);
                 validExt.B3C(curlabel) = bCubedCluster(labelsA,labelsB(:, curlabel));
-                list(curlabel, ind) = validExt.B3C(curlabel);
+                list(ind, curlabel) = validExt.B3C(curlabel);
                 chdir(oldPath);
 
             case 'B3E'
@@ -424,7 +424,7 @@ for curlabel=1:numLabels
                 % 1998, pp. 563–566.
                 oldPath=chdir(['..',filesep,'validation',filesep,'BCUBED']);
                 validExt.B3E(curlabel) = bCubedElement(labelsA,labelsB(:, curlabel));
-                list(curlabel, ind) = validExt.B3E(curlabel);
+                list(ind, curlabel) = validExt.B3E(curlabel);
                 chdir(oldPath);
 
             otherwise
@@ -443,7 +443,7 @@ for curlabel=1:numLabels
                     oldPath=chdir(['..',filesep,'validation',filesep]);
                     disp(['USER-DEFINED :: Executing function: ',usrAbbr{idx},'=',usrMeth{idx},'(...) -- ',usrDesc{idx}])
                     validExt.(usrAbbr{idx})(curlabel)=feval(str2func(usrMeth{idx}),labelsA,labelsB(:, curlabel));
-                    list(curlabel, ind) = validExt.(usrAbbr{idx})(curlabel);
+                    list(ind, curlabel) = validExt.(usrAbbr{idx})(curlabel);
                     chdir(oldPath);
                 else
                     disp(['Non-existing method name: ', methods{ind}, '! Ignoring.']);

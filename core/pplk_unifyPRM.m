@@ -1,6 +1,6 @@
 function PRM = pplk_unifyPRM(V, mask, method)
 % PRM = pplk_unifyPRM(V, mask, method)
-%
+% TODO description
 % INPUTS
 %   V 
 %       Matrix of indices' values.
@@ -31,6 +31,8 @@ function PRM = pplk_unifyPRM(V, mask, method)
 %               (suitable for Rank Aggregation).
 %           'none'
 %               Do nothing, PRM = V.
+%
+%   TODO Outputs
 %
 % If not specifed otherwise, we assume that every index assigns low value
 % to low quality clustering and high to better ones.

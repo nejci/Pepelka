@@ -1,134 +1,137 @@
 function [labelsCons,numClust,moreInfo] = pplk_consEns(labelsEns,K,method,params)
-% [labelsCons,numClust] = pplk_consEns(labelsEns,K,method,params)
+% [labelsCons,numClust,moreInfo] = pplk_consEns(labelsEns,K,method,params)
 % Computes consensus partition from partitions in the ensemble.
 %
 % INPUTS
-% labelsEns       
-%   Cluster ensemble - labels are stored in the columns of an N-by-E
-%   matrix, where N is number of data points and E is number of
-%   clusterings.
+%   labelsEns       
+%       Cluster ensemble - labels are stored in the columns of an N-by-E
+%       matrix, where N is number of data points and E is number of
+%       clusterings.
 % 
-% K
-%   Number of final clusters; can be empty for some methods, which can
-%   automatically determine K.
+%   K
+%       Number of final clusters; can be empty for some methods, which can
+%       automatically determine K.
 % 
-% method
-%   Consensus function name, one of the following:
+%   method
+%       Consensus function name, one of the following:
 % 
-%       'BCE'
-%           P. Wang, C. Domeniconi, and K. Laskey, "Nonparametric Bayesian
-%           Clustering Ensembles," in Machine Learning and Knowledge
-%           Discovery in Databases, vol. 6323, J. Balcázar, F. Bonchi, A.
-%           Gionis, and M. Sebag, Eds. Springer Berlin / Heidelberg, 2010,
-%           pp. 435-450.
-%       'COMUSA'
-%           S. Mimaroglu and E. Erdil, "Combining multiple clusterings
-%           using similarity graph," Pattern Recognition, vol. 44, no. 3,
-%           pp. 694-703, Mar. 2011.
-%       'DICLENS'-[''|'W'|'ORIG']
-%           S. Mimaroglu and E. Aksehirli, "DICLENS: Divisive Clustering
-%           Ensemble with Automatic Cluster Number," IEEE/ACM transactions
-%           on computational biology and bioinformatics, vol. 9, no. 2, pp.
-%           408-420, Sep. 2012.
-%       'EAC'-['SL'|'CL'|'AL'|'WL']
-%           A. L. N. Fred and A. K. Jain, "Combining Multiple Clusterings
-%           Using Evidence Accumulation," IEEE Transactions on Pattern
-%           Analysis and Machine Intelligence, vol. 27, no. 6, pp. 835-850,
-%           2005.
-%       'HBGF'
-%           X. Z. Fern and C. E. Brodley, "Solving cluster ensemble
-%           problems by bipartite graph partitioning," in Proceedings of
-%           the twenty-first international conference on Machine learning,
-%           2004, p. 36.
-%       'HUANG'-['SL'|'CL'|'AL'|'GPMGLA']
-%           Dong Huang, Jian-Huang Lai, Chang-Dong Wang. Combining Multiple
-%           Clusterings via Crowd Agreement Estimation and Multi-
-%           Granularity Link Analysis. Neurocomputing, 2014.
-%       'LCE'-['CTS'|'SRS'|'ASRS']-['SL'|'CL'|'AL']
-%           N. Iam-On, T. Boongoen, and S. Garrett, "LCE: a link-based
-%           cluster ensemble method for improved gene expression data
-%           analysis," Bioinformatics, vol. 26, no. 12, pp. 1513-1519,
-%           2010.
-%       'PAC'-['SL'|'CL'|'AL'|'WL']
-%           X. Wang, C. Yang, and J. Zhou, "Clustering aggregation by
-%           probability accumulation," Pattern Recognition, vol. 42, pp.
-%           668-675, 2009.
-%       'STREHL'-['CSPA'|'HGPA'|'MCLA']['-W']
-%           A. Strehl and J. Ghosh, "Cluster ensembles - a knowledge reuse
-%           framework for combining multiple partitions," The Journal of
-%           Machine Learning Research, vol. 3, pp. 583-617, 2003.
-%       'WEA'-['SL'|'CL'|'AL'|'WL']
-%           S. Vega-Pons, J. Ruiz-Shulcloper, and A. Guerra-Gandón,
-%           "Weighted association based methods for the combination of
-%           heterogeneous partitions," Pattern Recognition Letters, vol.
-%           32, no. 16, pp. 2163-2170, Dec. 2011.
-%       'WEAC'-['SL'|'CL'|'AL'|'WL']
-%           F. J. Duarte, A. L.N.Fred, A. Lourenco, and M. F. Rodrigues,
-%           "Weighting Cluster Ensembles in Evidence Accumulation
-%           Clustering," in 2005 Portuguese Conference on Artificial
-%           Intelligence, 2005, vol. 00, pp. 159-167.
-%       'ZHOU'-['VOTE'|'WVOTE'|'SVOTE'|'SWVOTE']
-%           IMPORTANT! Number of clusters in ensemble have to equal number
-%           in consensus. 
-%           Z.-H. Zhou and W. Tang, "Clusterer ensemble," Knowledge-Based
-%           Systems, vol. 19, no. 1, pp. 77-83, 2006.
+%           'BCE'
+%               P. Wang, C. Domeniconi, and K. Laskey, "Nonparametric
+%               Bayesian Clustering Ensembles," in Machine Learning and
+%               Knowledge Discovery in Databases, vol. 6323, J. Balcázar,
+%               F. Bonchi, A. Gionis, and M. Sebag, Eds. Springer Berlin /
+%               Heidelberg, 2010, pp. 435-450.
+%           'COMUSA'
+%               S. Mimaroglu and E. Erdil, "Combining multiple clusterings
+%               using similarity graph," Pattern Recognition, vol. 44, no.
+%               3, pp. 694-703, Mar. 2011.
+%           'DICLENS'-[''|'W'|'ORIG']
+%               S. Mimaroglu and E. Aksehirli, "DICLENS: Divisive
+%               Clustering Ensemble with Automatic Cluster Number,"
+%               IEEE/ACM transactions on computational biology and
+%               bioinformatics, vol. 9, no. 2, pp. 408-420, Sep. 2012.
+%           'EAC'-['SL'|'CL'|'AL'|'WL']
+%               A. L. N. Fred and A. K. Jain, "Combining Multiple
+%               Clusterings Using Evidence Accumulation," IEEE Transactions
+%               on Pattern Analysis and Machine Intelligence, vol. 27, no.
+%               6, pp. 835-850, 2005.
+%           'HBGF'
+%               X. Z. Fern and C. E. Brodley, "Solving cluster ensemble
+%               problems by bipartite graph partitioning," in Proceedings
+%               of the twenty-first international conference on Machine
+%               learning, 2004, p. 36.
+%           'HUANG'-['SL'|'CL'|'AL'|'GPMGLA']
+%               Dong Huang, Jian-Huang Lai, Chang-Dong Wang. Combining
+%               Multiple Clusterings via Crowd Agreement Estimation and
+%               Multi- Granularity Link Analysis. Neurocomputing, 2014.
+%           'LCE'-['CTS'|'SRS'|'ASRS']-['SL'|'CL'|'AL']
+%               N. Iam-On, T. Boongoen, and S. Garrett, "LCE: a link-based
+%               cluster ensemble method for improved gene expression data
+%               analysis," Bioinformatics, vol. 26, no. 12, pp. 1513-1519,
+%               2010.
+%           'PAC'-['SL'|'CL'|'AL'|'WL']
+%               X. Wang, C. Yang, and J. Zhou, "Clustering aggregation by
+%               probability accumulation," Pattern Recognition, vol. 42,
+%               pp. 668-675, 2009.
+%           'STREHL'-['CSPA'|'HGPA'|'MCLA']['-W']
+%               A. Strehl and J. Ghosh, "Cluster ensembles - a knowledge
+%               reuse framework for combining multiple partitions," The
+%               Journal of Machine Learning Research, vol. 3, pp. 583-617,
+%               2003.
+%           'WEA'-['SL'|'CL'|'AL'|'WL']
+%               S. Vega-Pons, J. Ruiz-Shulcloper, and A. Guerra-Gandón,
+%               "Weighted association based methods for the combination of
+%               heterogeneous partitions," Pattern Recognition Letters,
+%               vol. 32, no. 16, pp. 2163-2170, Dec. 2011.
+%           'WEAC'-['SL'|'CL'|'AL'|'WL']
+%               F. J. Duarte, A. L.N.Fred, A. Lourenco, and M. F.
+%               Rodrigues, "Weighting Cluster Ensembles in Evidence
+%               Accumulation Clustering," in 2005 Portuguese Conference on
+%               Artificial Intelligence, 2005, vol. 00, pp. 159-167.
+%           'ZHOU'-['VOTE'|'WVOTE'|'SVOTE'|'SWVOTE']
+%               IMPORTANT! Number of clusters in ensemble have to equal
+%               number in consensus. Z.-H. Zhou and W. Tang, "Clusterer
+%               ensemble," Knowledge-Based Systems, vol. 19, no. 1, pp.
+%               77-83, 2006.
 %
-% params
-%   Parameters structure; can be empty or non-existent for defaults.
-%   Used fields:
+%   params
+%       Parameters structure; can be empty or non-existent for defaults.
+%       Used fields:
 %
-%   BCE
-%       .BCE_Ki        
-%           Number of clusters in ensemble.
-%       .BCE_alphaInit 
-%           Init values for alpha.
-%       .BCE_betaInit  
-%           Init values for beta.
-%       .BCE_lapParam  
-%           Laplacian smoothing parameter.
-%   COMUSA
-%       .COMUSA_relaxation 
-%           Relaxation of maximum edge weight constraint. 0.5 means 50%
-%           relaxation and thus bigger final clusters [0].
-%   HUANG
-%       .HUANG_betaOrINCAI
-%       .HUANG_alpha
-%   LCE
-%       .LCE_dc        
-%           Decay factor [0.8].
-%       .LCE_R         
-%           Number of iters for SimRank algorithm [5].
-%   PAC
-%       .PAC_dim       
-%           Dimensionality of the original data.
-%   WEA
-%       .WEA_data      
-%           Original data or (dis)similarity matrix.
-%       .WEA_dataMode  
-%           'data', 'dist' or 'sim'.
-%       .WEA_dataDist  
-%           If dataMode is 'data', provide with distance type between data.
-%       .WEA_normalize 
-%           Whether to use normalized weights [1].
-%   WEAC and DICLENS-W
-%       .WEAC_data
-%       .WEAC_CVI
-%       .WEAC_CVImat
-%       .WEAC_unifyMeth
-%       .WEAC_reduceMeth
-%       .WEAC_reduceDim
-%       .WEAC_weightMeth
-%       .WEAC_weightMode
-%       .WEAC_weights
+%       BCE
+%           BCE_Ki        
+%              Number of clusters in ensemble.
+%           BCE_alphaInit 
+%             Init values for alpha.
+%           BCE_betaInit  
+%             Init values for beta.
+%           BCE_lapParam  
+%               Laplacian smoothing parameter.
+%       COMUSA
+%           COMUSA_relaxation 
+%               Relaxation of maximum edge weight constraint. 0.5 means 50%
+%               relaxation and thus bigger final clusters [0].
+%       HUANG
+%           HUANG_betaOrINCAI
+%           HUANG_alpha
+%       LCE
+%           LCE_dc        
+%               Decay factor [0.8].
+%           LCE_R         
+%               Number of iters for SimRank algorithm [5].
+%       PAC
+%           PAC_dim       
+%               Dimensionality of the original data.
+%       WEA
+%           WEA_data      
+%               Original data or (dis)similarity matrix.
+%           WEA_dataMode  
+%               'data', 'dist' or 'sim'.
+%           WEA_dataDist  
+%               If dataMode is 'data', provide with distance type between 
+%               data.
+%           WEA_normalize 
+%               Whether to use normalized weights [1].
+%       WEAC and DICLENS-W
+%           WEAC_data
+%           WEAC_CVI
+%           WEAC_CVImat
+%           WEAC_unifyMeth
+%           WEAC_reduceMeth
+%           WEAC_reduceDim
+%           WEAC_weightMeth
+%           WEAC_weightMode
+%           WEAC_weights
 %
 % 
 % OUTPUTS
-% labelsCons
-%   Ensemble clustering result - labels.
+%   labelsCons
+%       Ensemble clustering result - labels.
 %
-% numClust
-%   Number of clusters in the consensus partition.
+%   numClust
+%       Number of clusters in the consensus partition.
 %
+%   TODO Moreinfo explenation
 % 
 % This is a part of the Pepelka package.
 % Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)

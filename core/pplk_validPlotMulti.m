@@ -1,5 +1,5 @@
 function [fig] = pplk_validPlotMulti(validResults, numClust, validMethods, clustMethods)
-
+% TODO REWRITE DOCS
 % validResults
 %       A cell of numValidMethods-by-length(numClust) matrices with values
 %       of indeces in rows.

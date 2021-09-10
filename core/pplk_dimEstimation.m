@@ -3,37 +3,38 @@ function dimEst = pplk_dimEstimation(data, method)
 % Performs an estimation of the intrinsic dimensionality of data.
 %
 % INPUTS
-% data
-%   An n-by-d matrix of data (each row represents a data point).
+%   data
+%       A N-by-D matrix of data, where N is number of data samples and D is
+%       number of dimensions.
 %
-% method
-%   Choose one of the following methods:
+%   method
+%       Choose one of the following methods:
 %
-%   'CorrDim' 
-%       Based on correlation dimension.
-%   'NearNbDim' 
-%       Based on nearest neighbor dimension.
-%   'GMST' 
-%       Based on the analysis of the geodesic minimum spanning tree.
-%   'PackingNumbers' 
-%       Based on the analysis of data packing number.
-%   'EigValue' 
-%       Based on analysis of PCA eigenvalues.
-%   'MLE' 
-%       Maximum likelihood estimator.
-%   'MiND_ML' 
-%       Minimum Neighbor Distance.
-%   'MiND_KL' 
-%       Minimum Neighbor Distance using Kullback-Leibler divergence.
-%   'DANCo' 
-%       Dimensionality from Angle and Norm Concentration.
-%   'DANCoFit' 
-%       Fast Dimensionality from Angle and Norm Concentration.
-%   'kNN1', 'kNN2', 'kNN3' 
-%       J. A. Costa and A. O Hero, 2003,2004.
-%   'Hein' 
-%       M. Hein & J-Y. Audibert, 2005.
-%   'Takens'
+%       'CorrDim' 
+%           Based on correlation dimension.
+%       'NearNbDim' 
+%           Based on nearest neighbor dimension.
+%       'GMST' 
+%           Based on the analysis of the geodesic minimum spanning tree.
+%       'PackingNumbers' 
+%           Based on the analysis of data packing number.
+%       'EigValue' 
+%           Based on analysis of PCA eigenvalues.
+%       'MLE' 
+%           Maximum likelihood estimator.
+%       'MiND_ML' 
+%          Minimum Neighbor Distance.
+%       'MiND_KL' 
+%           Minimum Neighbor Distance using Kullback-Leibler divergence.
+%       'DANCo' 
+%           Dimensionality from Angle and Norm Concentration.
+%       'DANCoFit' 
+%           Fast Dimensionality from Angle and Norm Concentration.
+%       'kNN1', 'kNN2', 'kNN3' 
+%           J. A. Costa and A. O Hero, 2003,2004.
+%       'Hein' 
+%          M. Hein & J-Y. Audibert, 2005.
+%       'Takens'
 %
 %
 % OUTPUTS

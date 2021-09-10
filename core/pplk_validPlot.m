@@ -1,5 +1,5 @@
 function [fig] = pplk_validPlot(validResults, numClust, validMethods)
-
+% TODO REWRITE DOCS
 % validResults
 %       - Structure with index name as field name and index values as its
 %         content (numeric vector).

@@ -3,39 +3,39 @@ function [dvrsMean, dvrsSpread, dvrsComb1, dvrsComb2, accu] = pplk_diversityEns(
 % Computes diversity measures from partitions in the ensemble.
 %
 % INPUTS		
-% labelsEns    
-%   Cluster ensemble - labels are stored in the columns of an N-by-E
-%   matrix, where N is number of data points and E is number of
-%   clusterings.
+%   labelsEns    
+%       Cluster ensemble - labels are stored in the columns of an N-by-E
+%       matrix, where N is number of data points and E is number of
+%       clusterings.
 %
-% labelsRef    
-%   Reference partitioning, relevant only for methods 'NPW'.
+%   labelsRef    
+%       Reference partitioning, relevant only for methods 'NPW'.
 %
-% method       
-%   PW
-%       Pairwise.
-%   NPW 
-%       Non-pairwise, required labelsRef.
+%   method       
+%       PW
+%           Pairwise.
+%       NPW 
+%           Non-pairwise, required labelsRef.
 %
-% measure      
-%   External validation indeces names (one or more).
+%   measures 
+%       External validation indeces names (one or more).
 %
 %
 % OUTPUTS
-% dvrsMean     
-%   Mean of PW or NPW diversity measure across ensemble members.
+%   dvrsMean     
+%       Mean of PW or NPW diversity measure across ensemble members.
 %
-% dvrsSpread   
-%   Sum of standard deviation of NPW diversity.
+%   dvrsSpread   
+%       Sum of standard deviation of NPW diversity.
 %
-% dvrsComb1    
-%   Combined measure: 1/2*(1-dvrsMean + dvrsSpread).
+%   dvrsComb1    
+%       Combined measure: 1/2*(1-dvrsMean + dvrsSpread).
 %
-% dvrsComb2    
-%   Combined measure: dvrsSpread/dvrsMean.
+%   dvrsComb2    
+%       Combined measure: dvrsSpread/dvrsMean.
 %
-% accu         
-%   Accuracy of ensemble members.
+%   accu         
+%       Accuracy of ensemble members.
 %
 %
 % ACKNOWLEDGEMENTS AND REFERENCES

@@ -6,7 +6,8 @@ function [labels, moreInfo]=pplk_runClusterer(methodName,data,K,nRuns,params)
 %       Abbreviated name of clustering algorithm.
 %
 %   data
-%       - A N-by-D matrix of input data.
+%       - A N-by-D matrix of data, where N is number of data samples and D
+%         is number of dimensions.
 %       - A filename or name of data in the datasets folder.
 %
 %   K
@@ -34,7 +35,7 @@ function [labels, moreInfo]=pplk_runClusterer(methodName,data,K,nRuns,params)
 %   Legend:
 %   methodName (params.methodName_[val]) Description
 %   *  can not-exists
-%   ** can be []
+%   ** can be empty
 %
 %   - AL (distance*) Average-linkage.
 %   - CLUSOT (cluster_method,msize**, shape, res, theta, theta0 / g) 

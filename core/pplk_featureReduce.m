@@ -4,55 +4,56 @@ function [dataR,featInd] = pplk_featureReduce(data, method, k, varargin)
 % (unsupervised feature selection and extraction).
 %
 % INPUTS
-%   data   
-%       Matrix with unified validity indices.
+%   data
+%       A N-by-D matrix of data, where N is number of data samples and D is
+%       number of dimensions.
 %
 %   method  
 %       Method to use for feature reduction.
 %
-%           selection
-%           - 'FSFS' 
+%           feature selection
+%           'FSFS' 
 %               Mitra et al., 2002.
-%           - 'LS'   
+%           'LS'   
 %               Laplacian Score by He et al., 2005.
-%           - 'SPEC' 
+%           'SPEC' 
 %               Spectral feature selection, Zhao & Liu 2007.
-%           - 'FSKM'
+%           'FSKM'
 %               Feature selection with k-medoids, Pepelka 2014.
 %
-%           extraction/transformation
-%           - 'PCA'
-%           - 'KPCA' 
+%           feature extraction/transformation
+%           'PCA'
+%           'KPCA' 
 %               Scholkopf et al., 1998.
-%           - 'ICA'  
+%           'ICA'  
 %               FastICA by Hyravinen et al., 2000.
-%           - any of supported methods in the Dimensionality reduction
-%             toolbox (by van der Maaten).
-%             Unsupervised (prefered):
+%           any of supported methods in the Dimensionality reduction
+%           toolbox (by van der Maaten).
+%           Unsupervised (prefered):
 %               'ProbPCA', 'MDS', 'FactorAnalysis',  'Isomap', 'Laplacian',
 %               'HessianLLE', 'LTSA','FastMVU', 'DiffusionMaps', 'SNE',
 %               'SymSNE', 'tSNE', 'SPE', 'Autoencoder'
-%             Unsupervised (occasional singularity problem on PRM data)
+%           Unsupervised (occasional singularity problem on PRM data)
 %               'GPLVM', 'Sammon', 'LandmarkIsomap', 'LLE', 'MVU', 'CCA',
 %               'LandmarkMVU', 'LPP', 'NPE', 'LLTSA', 'LLC',
 %               'ManifoldChart', 'CFA'
-%             Supervised / labeled
+%           Supervised / labeled
 %               'LDA', 'GDA', 'NCA', 'MCML', 'LMNN'
-%           - 'FEKM' 
+%           'FEKM' 
 %               Feature extraction with k-means, Pepelka 2014.
 %
 %   k
-%       - If k is a number, then it represents number of selected/extracted
-%         features. Exception is the method 'FSFS', where k approximately
-%         equals the number of selected features.
+%       If k is a number, then it represents number of selected/extracted
+%       features. Exception is the method 'FSFS', where k approximately
+%       equals the number of selected features.
 %
-%       - If k is non-existent, empty or string, estimation of intrinsic
-%         dimensionality is employed. If string, estimation is performed
-%         using method with such a name.
-%         Possible options are:
-%           'CorrDim','NearNbDim','GMST','PackingNumbers','EigValue','MLE',
-%           'MiND_ML','MiND_KL','DANCo','DANCoFit','kNN1','kNN2','kNN3',
-%           'Hein','Takens'.
+%       If k is non-existent, empty or string, estimation of intrinsic
+%       dimensionality is employed. If string, estimation is performed
+%       using method with such a name.
+%       Possible options are:
+%         'CorrDim','NearNbDim','GMST','PackingNumbers','EigValue','MLE',
+%         'MiND_ML','MiND_KL','DANCo','DANCoFit','kNN1','kNN2','kNN3',
+%         'Hein','Takens'.
 %               
 %   varargin
 %       Name-value list of optional parameters.
@@ -91,7 +92,7 @@ function [dataR,featInd] = pplk_featureReduce(data, method, k, varargin)
 %
 % OUTPUTS
 %   dataR
-%       Reduced PRM matrix with the selected/extracted features.
+%       Reduced data matrix with the selected/extracted features.
 %
 %   featInd 
 %       - Indices of the remaining features, if selection occures.
@@ -112,10 +113,10 @@ function [dataR,featInd] = pplk_featureReduce(data, method, k, varargin)
 %      Tilburg University, Technical Report, TiCC-TR 2009-005, 2009.
 %
 % Feature Selection using Feature Similarity
-%   P. Mitra, C. A. Murthy and S. K. Pal, Unsupervised Feature
-%   Selection using Feature Similarity, IEEE Transactions on Pattern
-%   Analysis and Machine Intelligence, Vol. 24, No. 4, pp 301-312,April 2002.
-%   Code written by Pabitra Mitra.
+%   P. Mitra, C. A. Murthy and S. K. Pal, Unsupervised Feature Selection
+%   using Feature Similarity, IEEE Transactions on Pattern Analysis and
+%   Machine Intelligence, Vol. 24, No. 4, pp 301-312,April 2002. Code
+%   written by Pabitra Mitra.
 %
 % Laplacian Score
 %   Xiaofei He, Deng Cai and Partha Niyogi, "Laplacian Score for

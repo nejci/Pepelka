@@ -8,22 +8,24 @@ function [data,labelsT,info] = pplk_loadData(datasetName)
 % INPUTS       
 %   datasetName
 %       - Filename in datasets folder.
-%       - Name of dataset (file is selected by matching in reference table).
+%       - Name of dataset (file is selected by matching in reference 
+%         table).
 %       - ID number of dataset (backward compatibility).
 %
 %
 % OUTPUTS      
 %   data
-%       A nPoints-by-nDimensions data matrix.
+%       A N-by-D matrix of data, where N is number of data samples and D is
+%       number of dimensions.
 %
 %   labelsT      
-%       A nPoints-by-1 true labels vector stored in 
-%       '..\datasets\dataNameT.mat' 
+%       A ground truth vector of data labels.
+%   TODO explain info
 %
 %
 % EXAMPLES
-%   [data,target,info] = pplk_loadData('real\UCI\iris');
-%   [data,target,info] = pplk_loadData('iris');
+%   [data,target,info] = pplk_loadData('real\UCI\iris'); TODO explenation
+%   [data,target,info] = pplk_loadData('iris'); TODO 
 %
 %
 % This is a part of the Pepelka package.

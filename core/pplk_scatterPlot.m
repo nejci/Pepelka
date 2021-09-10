@@ -8,8 +8,9 @@ function [fig,data] = pplk_scatterPlot(data,labels,K,options)
 %       A N-by-D matrix of input data.
 %
 %   labels
-%       - A vector of data labels - clustering.
-%       - A matrix set of clusterings - plot them on the subfigure.
+%       Labels of data. 
+%       - A vector of length N.
+%       - A N-by-E matrix.
 %
 %   K		
 %       Number of clusters; if [] or non-existent, K becomes the number of 
@@ -18,27 +19,27 @@ function [fig,data] = pplk_scatterPlot(data,labels,K,options)
 %   options	
 %       Options structure; can be [] or non-existent for defaults.
 %       Fields:
-%           .title 
+%           title 
 %               Main title.
-%           .subtitle 
+%           subtitle 
 %               Cell of strings - one string for each subplot.
-%           .axisLabels 
+%           axisLabels 
 %               1-by-2 cell of strings.
-%           .axisTicks 
+%           axisTicks 
 %               1-by-2 cell of vectors.
-%           .axisStyle 
+%           axisStyle 
 %               String, eg. 'square', 'equal', 'tight'.
-%           .colorMode 
+%           colorMode 
 %               ['color'|'pattern'|'mixed'].
-%           .normalize 
+%           normalize 
 %               Normalize on interval [0,1].
-%           .fig 
+%           fig 
 %               Force this figure handle.
-%           .annotations 
+%           annotations 
 %               n-by-1 cell of strings, where n is number of data points.
-%           .markerSize
+%           markerSize
 %               Size of the marker.
-%           .interpreterMode 
+%           interpreterMode 
 %               'tex','latex',['none'].
 %
 %

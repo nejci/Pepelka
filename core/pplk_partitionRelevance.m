@@ -1,17 +1,18 @@
 function [weights,PRM,featInd]=pplk_partitionRelevance(data,labelsEns,indicesList,unifyMethod,reduceMethod,weightMethod,weightMode,options)
-% [weights,PRM]=pplk_partitionRelevance(data,labelsEns,indicesList,
+% [weights,PRM,featInd]=pplk_partitionRelevance(data,labelsEns,indicesList,
 % unifyMethod,reduceMethod,weightMethod,weightMode,options)
 % Partition Relevance step in clustering ensembles.
 %
 % INPUTS
 %   data
-%       - A nPatterns-by-nDimensions matrix of data that were clustered.
-%       - Can be empty if options.CVImat is provided (values of cluster
-%         validation indices have been pre-computed).
+%       A N-by-D matrix of data, where N is number of data samples and D is
+%       number of dimensions. Can be empty if options.CVImat is provided
+%       (values of cluster validation indices have been pre-computed).
 %
 %   labelsEns   
-%       Ensemble of labels - result of an ensemble generation step in a
-%       N-by-ensembleSize matrix.
+%       Cluster ensemble - labels are stored in the columns of an N-by-E
+%       matrix, where N is number of data points and E is number of
+%       clusterings.
 %
 %   indicesList
 %       A cell containing one or more cluster validity indices:
@@ -82,38 +83,40 @@ function [weights,PRM,featInd]=pplk_partitionRelevance(data,labelsEns,indicesLis
 %       Which method for feature reduction to use (to eliminate 
 %       non-informative indices):
 %
-%           - 'NONE'
+%       See pplk_featureReduce for more details.
+%
+%           'NONE'
 %               Do not use any (default).
 %
-%           selection
-%           - 'FSFS' 
+%           feature selection
+%           'FSFS' 
 %               Mitra et al., 2002.
-%           - 'LS'   
+%           'LS'   
 %               Laplacian Score by He et al., 2005.
-%           - 'SPEC' 
+%           'SPEC' 
 %               Spectral feature selection, Zhao & Liu 2007.
-%           - 'FSKM'
+%           'FSKM'
 %               Feature selection with k-medoids, Pepelka 2014.
 %
-%           extraction/transformation
-%           - 'PCA'
-%           - 'KPCA' 
+%           feature extraction/transformation
+%           'PCA'
+%           'KPCA' 
 %               Scholkopf et al., 1998.
-%           - 'ICA'  
+%           'ICA'  
 %               FastICA by Hyravinen et al., 2000.
-%           - any of supported methods in the Dimensionality reduction
-%             toolbox (by van der Maaten).
-%             Unsupervised (prefered):
+%           any of supported methods in the Dimensionality reduction
+%           toolbox (by van der Maaten).
+%           Unsupervised (prefered):
 %               'ProbPCA', 'MDS', 'FactorAnalysis',  'Isomap', 'Laplacian',
 %               'HessianLLE', 'LTSA','FastMVU', 'DiffusionMaps', 'SNE',
 %               'SymSNE', 'tSNE', 'SPE', 'Autoencoder'
-%             Unsupervised (occasional singularity problem on PRM data)
+%           Unsupervised (occasional singularity problem on PRM data)
 %               'GPLVM', 'Sammon', 'LandmarkIsomap', 'LLE', 'MVU', 'CCA',
 %               'LandmarkMVU', 'LPP', 'NPE', 'LLTSA', 'LLC',
 %               'ManifoldChart', 'CFA'
-%             Supervised / labeled
+%           Supervised / labeled
 %               'LDA', 'GDA', 'NCA', 'MCML', 'LMNN'
-%           - 'FEKM' 
+%           'FEKM' 
 %               Feature extraction with k-means, Pepelka 2014.
 %
 %   weightMethod, weigthMode
@@ -128,7 +131,7 @@ function [weights,PRM,featInd]=pplk_partitionRelevance(data,labelsEns,indicesLis
 %       - difference ('wDiff')
 %       - Vega-Pons et al. 2010 ('wVegaPons')['CLK'|'CBK']
 %       - rank aggregation ('wRankAggreg')
-%       ['min'|'mean'|'median'|'geom.mean'|'stuart'|'RRA']
+%         ['min'|'mean'|'median'|'geom.mean'|'stuart'|'RRA']
 %
 %   options.reduceDim 
 %       Number of reduced dimensions or name of estimator (passed to 

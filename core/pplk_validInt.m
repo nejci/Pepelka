@@ -3,13 +3,15 @@ function [validInt, list] = pplk_validInt(data, labels, methods, options)
 % Internal validity indices for estimating clustering quality and
 % number of clusters.
 %
-% INPUTS
+% INPUTS 
 %   data
-%       A nPatterns-by-nDimensions matrix of data that were clustered.
+%       A N-by-D matrix of data that were clustered (N is number of data 
+%       samples and D is number of dimensions).
 %
 %   labels
-%       Labels of data, result of a clustering task can be nPatterns-by-1
-%       vector or nPatterns-by-nNCs matrix of labels.
+%       Labels of data. 
+%       - A vector of length N.
+%       - A N-by-E matrix.
 %
 %   methods
 %       A cell containing one or more method's identifier. You can use
@@ -187,14 +189,14 @@ function [validInt, list] = pplk_validInt(data, labels, methods, options)
 %       Numeric nMethods-by-nClusterings matrix with values of indices.
 %
 %
-%   Requirements:
-%       MATLAB Statistics Toolbox
-%       (Silhouette function, crosstab, nanmean, pdist, pdist2)
+% REQUIREMENTS
+%   MATLAB Statistics Toolbox
+%   (silhouette, pdist, pdist2)
 %
 %
-%   ACKNOWLEDGEMENTS AND REFERENCES
-%       Cluster Validity Analysis Platform (CVAP) (Version 3.4)
-%       Copyright (C) 2006-2007 by Kaijun Wang.
+% ACKNOWLEDGEMENTS AND REFERENCES
+%   Cluster Validity Analysis Platform (CVAP) (Version 3.4)
+%   Copyright (C) 2006-2007 by Kaijun Wang.
 %
 %
 % This is a part of the Pepelka package.

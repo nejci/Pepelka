@@ -2,26 +2,27 @@ function S = pplk_dist2sim(D,method,isGraph,sigma,order)
 % S = pplk_dist2sim(D,method,isGraph,sigma,order)
 % Converts distance matrix D to similarity matrix S, using transformation.
 %
-% INPUTS
-% method 
-%   'lin'
-%       Linear, normalized. 
-%   'lin2'
-%       Linear, normalized, max=1, min sim. = min. dist.
-%   'ncut'
-%       As defined by authors of Normalized Cuts algorithm. 
-%       S = exp(-(D./sigma).^order). 
-%   'gauss'
-%       Gaussian; sigma is half of range if not otherwise defined! 
-%   'gauss2'
-%       Quasi gaussian, normalized, without sigma.
-%   'gauss3'
-%       Quasi gaussian, without sigma.
+% INPUTS TODO dodj se razlago za ostale input parametre
+%   method 
+%       'lin'
+%           Linear, normalized. 
+%       'lin2'
+%           Linear, normalized, max=1, min sim. = min. dist.
+%       'ncut'
+%           As defined by authors of Normalized Cuts algorithm. 
+%           S = exp(-(D./sigma).^order). 
+%       'gauss'
+%           Gaussian; sigma is half of range if not otherwise defined! 
+%       'gauss2'
+%           Quasi gaussian, normalized, without sigma.
+%       'gauss3'
+%           Quasi gaussian, without sigma.
 %
-% isGraph
-%   If D is distance matrix of graph, set this to 1 to ensure zero entries
-%   remain zero!
+%   isGraph
+%       If D is distance matrix of graph, set this to 1 to ensure zero
+%       entries remain zero!
 %
+%   TODO output
 %
 % This is a part of the Pepelka package.
 % Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)

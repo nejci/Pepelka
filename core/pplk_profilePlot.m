@@ -1,9 +1,10 @@
 function [fig]=pplk_profilePlot(data,labels,K,varargin)
 % [fig]=pplk_profilePlot(data,labels,K,varargin)
 %
-% INPUTS		
+% INPUTS TODO explenation za K, varargin
 %   data
-%       A N-by-D matrix of input data.
+%       A N-by-D matrix of data, where N is number of data samples and D is
+%       number of dimensions.
 %
 %   labels
 %       A vector of data labels - clustering.
@@ -11,18 +12,28 @@ function [fig]=pplk_profilePlot(data,labels,K,varargin)
 %   options			
 %       Options structure or name-value list.
 %       It's fields are:
-%           - figTitle
-%           - axisLabels a 1-by-2 cell of strings
-%           - axisTicks a 1-by-2 cell of vectors
-%           - axisTicksLabels a 1-by-2 cell of string 1-by-D cells
-%           - view ['overview'|'scatterPlot'|'details'|'PCA']
-%           - colorMode ['color'|'pattern'|'mixed'|'mixedClear'] 
-%             (only for scatterPlot)
-%           - normalize - (scatterPlot) normalize on interval [0,1]
-%           - fig - force this figure handle
-%           - annotations a n-by-1 cell of strings, where n is the number 
-%             of data points
-%           - centroids [0 | 1] - plot cluster centroid or not 
+%           figTitle
+%               The title.
+%           axisLabels 
+%               A 1-by-2 cell of strings.
+%           axisTicks 
+%               A 1-by-2 cell of vectors.
+%           axisTicksLabels 
+%               A 1-by-2 cell of string 1-by-D cells.
+%           view 
+%               ['overview'|'scatterPlot'|'details'|'PCA'].
+%           colorMode 
+%               ['color'|'pattern'|'mixed'|'mixedClear']
+%               (only for scatterPlot).
+%           normalize
+%               (scatterPlot) Normalize on interval [0,1].
+%           fig 
+%               Force this figure handle.
+%           annotations 
+%               A n-by-1 cell of strings, where n is the number of data
+%               points.
+%           - centroids 
+%               [0 | 1] - whether to plot cluster centroid or not. 
 %
 %
 % OUTPUTS	

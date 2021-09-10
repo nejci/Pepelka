@@ -5,8 +5,9 @@ function [labelsEns, moreInfo] = pplk_genEns(data, methods, params)
 % into a N-by-ensembleSize labelsEns matrix.
 %
 % INPUTS		
-%   data	
-%       A n-by-d matrix of input data.
+%   data
+%       A N-by-D matrix of data, where N is number of data samples and D is
+%       number of dimensions.
 %
 %   methods		
 %       A M-by-4 cell, containing details about ensemble structure:
@@ -16,7 +17,7 @@ function [labelsEns, moreInfo] = pplk_genEns(data, methods, params)
 %       methodNameM, repetitionsM, kM, modeM}
 %
 %   params			
-%       Parameters structure; can be [] or non-existent for defaults;
+%       Parameters structure; can be empty or non-existent for defaults;
 %       params.subsampling controls data subsampling before clustering
 %       subsmpl = params.subsampling is a cell with 1 or 2 elements:
 %           subsmpl{1} - type:
@@ -39,8 +40,9 @@ function [labelsEns, moreInfo] = pplk_genEns(data, methods, params)
 %
 % OUTPUTS		
 %   labelsEns
-%       Clusterings - N-by-1 column vectors, obtained from single
-%       clusterer, concatenated into a N-by ensembleSize matrix.
+%       Cluster ensemble - labels are stored in the columns of an N-by-E
+%       matrix, where N is number of data points and E is number of
+%       clusterings.
 %
 %   moreInfo
 %       Other info from clusterer (time, etc.).
@@ -52,7 +54,7 @@ function [labelsEns, moreInfo] = pplk_genEns(data, methods, params)
 %   Legend:
 %   methodName (params.methodName_[val]) Description
 %   *  can not-exists
-%   ** can be []
+%   ** can be empty
 %
 %   - AL (distance*) Average-linkage.
 %   - CS (sigma**, Kin, Nin ) Cauchy-Schwarz divergence.
@@ -143,6 +145,7 @@ function [labelsEns, moreInfo] = pplk_genEns(data, methods, params)
 % This is a part of the Pepelka package.
 % Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
 % https://github.com/nejci/Pepelka
+%
 % See also runClusterer, setParamsDefault, setParamsForData
 
 

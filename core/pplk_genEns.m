@@ -1,140 +1,152 @@
 function [labelsEns, moreInfo] = pplk_genEns(data, methods, params)
-% PPLK_GENENS
 % [labelsEns, moreInfo] = pplk_genEns(data, methods, params)
-% INPUTS:		data			(matrix)	input data, size of [N x D]
-%				methods			(cell)		M x 4 cell, containing details
-%											about ensemble structure:
-%											{methodName1, repetitions1, k1, mode1; ...
-%											methodName2, repetitions2, k2, mode2; ...
-%											...
-%											methodNameM, repetitionsM, kM, modeM}
+% Function pplk_genEns creates ensemble, according to methods cell. It
+% performs data clustering with selected algoritms and packs the results
+% into a N-by-ensembleSize labelsEns matrix.
 %
-%				params			(struct)	parameters structure; can be
-%											[] or non-existent for defaults;
-%               params.subsampling controls data subsampling before clustering
-%               subsmpl = params.subsampling is a cell with 1 or 2 elements:
-%                   subsmpl{1} - type:
-%                      'none': no subsampling
-%                      'rows': sample by rows
-%                      'cols': sample by columns
-%                   subsmpl{2} - size of sample:
-%                      percentage; number on interval (0,1)); 0.1 means 10%
-%                      percentage interval [a,b]; choose randomly from interval
-%                      number on interval [1, no.elements]
-%                      string 'rand'; random number on interval [1, no.elements]
+% INPUTS		
+%   data
+%       A N-by-D matrix of data, where N is number of data samples and D is
+%       number of dimensions.
 %
-% OUTPUTS:		labelsEns		(matrix)	clusterings - column vectors
-%											[N x 1], obtained from single clusterer,
-%											concatenated into matrix [N x ensembleSize]
-%				moreInfo		(cell)		other info from clusterer (time, etc.)
+%   methods		
+%       A M-by-4 cell, containing details about ensemble structure:
+%       {methodName1, repetitions1, k1, mode1; ...
+%       methodName2, repetitions2, k2, mode2; ...
+%       ...
+%       methodNameM, repetitionsM, kM, modeM}
+%
+%   params			
+%       Parameters structure; can be empty or non-existent for defaults;
+%       params.subsampling controls data subsampling before clustering
+%       subsmpl = params.subsampling is a cell with 1 or 2 elements:
+%           subsmpl{1} - type:
+%               'none'
+%                   No subsampling.
+%               'rows'
+%                   Sample by rows.
+%               'cols'
+%                   Sample by columns
+%
+%           subsmpl{2} - size of sample:
+%               percentage
+%                   Number on interval (0,1)); 0.1 means 10%.
+%               percentage interval [a,b]
+%                   Choose randomly from interval. Number on interval 
+%                   [1, no.elements].
+%               string 'rand'
+%                   Random number on interval [1, no.elements].
 %
 %
-% DESCRIPTION:	Function pplk_genEns creates ensemble, according to methods
-%				cell. It performs data clustering with selected algoritms
-%				and packs the results into labelsEns matrix, size of
-%				[N x ensembleSize].
+% OUTPUTS		
+%   labelsEns
+%       Cluster ensemble - labels are stored in the columns of an N-by-E
+%       matrix, where N is number of data points and E is number of
+%       clusterings.
+%
+%   moreInfo
+%       Other info from clusterer (time, etc.).
+%
 %
 % DETAILS on inputs 'methods' and 'params'
 %
 % List of available methods with associated parameters:
-%
-%   --------------+-----------------------------------------+-------------
-%   methodName    | params.methodName_[val]					| Description
-%   --------------+-----------------------------------------+-------------
-%   AL            | distance*                               | Average-linkage
-%   CS            | sigma**, Kin, Nin                       | Cauchy-Schwarz divergence
-%   EM            | /                                       | Expectation Maximization
-%   FCM           | /										| Fuzzy C-means
-%   GSOM          | G,dG,alfa,maxIter, pOut, msize**, shape	| Gravitational SOM
-%                 | distance, showSOM, showGrav, advanced   |
-%   HCL           | clustMethod, distance                   | Hierarchical Clustering (general, including AL,SL,WL)
-%   SOMKM		  | nRuns, msize**, shape                   | K-means on the SOM
-%   KCC           | /										| K-centers
-%   KM            | maxIter, nRuns, distance                | K-means
-%   KVV           | sigma*  								| Kannan, Vempala and Vetta spectral
-%   NC            | /										| Normalized cuts
-%   NJW           | sigma*      							| Ng, Jordan and Weiss spectral
-%   RANDOM        |                                         | random partition
-%   SL            | distance*								| Single-linkage
-%   WL            | distance*								| Ward-linkage
-%   --------------+-------------------------------------------------------
+%   Legend:
+%   methodName (params.methodName_[val]) Description
 %   *  can not-exists
-%   ** can be []
+%   ** can be empty
+%
+%   - AL (distance*) Average-linkage.
+%   - CS (sigma**, Kin, Nin ) Cauchy-Schwarz divergence.
+%   - EM (/) Expectation Maximization.
+%   - FCM (/) Fuzzy C-means.
+%   - GSOM (G,dG,alfa,maxIter, pOut, msize**, shape, distance, showSOM, 
+%     showGrav, advanced) Gravitational SOM.        
+%   - HCL (clustMethod, distance) Hierarchical Clustering (general,
+%     including AL,SL,WL)
+%   - SOMKM (nRuns, msize**, shape) K-means on the SOM.
+%   - KCC (/) K-centers.
+%   - KM (maxIter, nRuns, distance) K-means.
+%   - KVV (sigma*) Kannan, Vempala and Vetta spectral   
+%   - NC (/) Normalized cuts.      
+%   - NJW (sigma*) Ng, Jordan and Weiss spectral.
+%   - RANDOM (/) Random partition.
+%   - SL (distance*) Single-linkage.
+%   - WL (distance*) Ward-linkage 
+%
 %
 % FORMAT of methods cell row:
-%   methodName =	select one from the list above
+%   methodName	
+%       Select one from the list above.
 %
-%	repetitions 	number of repetitions of each method. Partition from each
-%					repetition is regarded as 'ensemble member'.
-%                   If mode is 'fixed' and k is a vector [kmin,kmax],
-%                   there will be (repetitions*(kmax-kmin+1)) runs.
+%   repetitions 	
+%       Number of repetitions of each method. Partition from each
+%       repetition is regarded as 'ensemble member'. If mode is 'fixed' and
+%       k is a vector [kmin,kmax], there will be
+%       (repetitions*(kmax-kmin+1)) runs.
 %
-%	k               desired number of clusters if mode='fixed' or upper
-%					bound for number of clusters if mode='random'.
-%                   Also, k can be a vector of two elements [kmin,kmax]. If
-%                   k is an empty matrix [], it is automatically determined
-%                   (only if clusterer supports this).
+%   k
+%       Desired number of clusters if mode='fixed' or upper bound for
+%       number of clusters if mode='random'. Also, k can be a
+%       vector of two elements [kmin,kmax]. If k is an empty matrix [], it
+%       is automatically determined (only if clusterer
+%       supports this).
 %
-%	mode =			'fixed' : k is target number (interval) of clusters
-%					'rand'  : number of clusters is randomly chosen on
-%					          [2,k] if k is a scalar, or on [kmin,kmax] if
-%					          k is a vector.
+%   mode 
+%       'fixed'
+%           k is target number (interval) of clusters.
+%       'rand'  
+%           Number of clusters is randomly chosen on [2,k] if k is a 
+%           scalar, or on [kmin,kmax] if k is a vector.
+%
 %
 % EXAMPLES using methods formats
 %
-%	% 1. Homogeneous ensemble:
-%   %   a) K-means (100 runs) with fixed number of clusters (k = 3)
-%		   methods = {'KM',100,3,'fixed'};
+%   1. Homogeneous ensemble:
+%       a) K-means (100 runs) with fixed number of clusters (k = 3)
+%           methods = {'KM',100,3,'fixed'};
 %
-%   %   b) K-means (100 runs) with fixed number of clusters (k = sqrt(N))
-%		   methods = {'KM',100,[],'fixed'};
+%       b) K-means (100 runs) with fixed number of clusters (k = sqrt(N))
+%           methods = {'KM',100,[],'fixed'};
 %
-%   %   c) K-means with fixed number of clusters: go from 10 to 20
-%		   methods = {'KM',1,[10,20],'fixed'};
+%       c) K-means with fixed number of clusters: go from 10 to 20
+%           methods = {'KM',1,[10,20],'fixed'};
 %
-%   %   d) K-means with fixed number of clusters: go from 10 to 20 and on
-%   %      each step generate 2 partitions (repetitions)
-%		   methods = {'KM',2,[10,20],'fixed'};
+%       d) K-means with fixed number of clusters: go from 10 to 20 and on
+%          each step generate 2 partitions (repetitions)
+%           methods = {'KM',2,[10,20],'fixed'};
 %
-%   %   e) K-means (100 runs) with random number of clusters (from 2 to sqrt(N))
-%		   methods = {'KM',100,[],'rand'};
+%       e) K-means (100 runs) with random number of clusters (from 2 to 
+%       sqrt(N))
+%           methods = {'KM',100,[],'rand'};
 %
-%   %   f) K-means (100 runs) with random number of clusters (from 2 to 10)
-%		   methods = {'KM',100,10,'rand'};
+%       f) K-means (100 runs) with random number of clusters (from 2 to 10)
+%           methods = {'KM',100,10,'rand'};
 %
-%   %   g) K-means (100 runs) with random number of clusters (from 10 to 20)
-%		   methods = {'KM',100,[10,20],'rand'};
+%       g) K-means (100 runs) with random number of clusters (from 10 to 
+%       20)
+%           methods = {'KM',100,[10,20],'rand'};
 %
-%-------------------------------------------------------------------------
-%	2. Heterogeneous ensemble - based on various methods with fixed number of
-%	clusters (k=10)
+%	2. Heterogeneous ensemble - based on various methods with fixed number
+%	of clusters (k=10)
+%       methods =   {'KM',  1,10,'fixed'; ...
+%                   'GSOM',1,10,'fixed';...
+%                   'NC',  1,10,'fixed'};
 %
-%		methods=	{'KM',  1,10,'fixed'; ...
-%					 'GSOM',1,10,'fixed';...
-%					 'NC',  1,10,'fixed'};
-%
-%-------------------------------------------------------------------------
 %	3. Mixed ensemble - based on various methods with various number of
 %	runs and modes of choosing number of clusters - the most general case.
-%		methods =	{'KM',10,10,'rand'; ...
-%					'GSOM',1,[],'fixed';...
-%					'NC',10,[5,10],'rand';...
-%					'NC',5,10,'fixed';...
+%       methods =   {'KM',10,10,'rand'; ...
+%                   'GSOM',1,[],'fixed';...
+%                   'NC',10,[5,10],'rand';...
+%                   'NC',5,10,'fixed';...
 %                   'AL',1,[5,10],'fixed'};
 %
-%-------------------------------------------------------------------------
 %
-% SEE ALSO: runClusterer, setParamsDefault, setParamsForData
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 %
-%------- LEGAL NOTICE -----------------------------------------------------
-% Copyright (C) 2013  Nejc Ilc
-% Part of Pepelka package.
-%------- VERSION ----------------------------------------------------------
-% Version: 1.2
-% Last modified: 24-October-2013 by Nejc Ilc
-%------- CONTACT ----------------------------------------------------------
-% Please write to: Nejc Ilc <nejc.ilc@fri.uni-lj.si>
-%==========================================================================
+% See also runClusterer, setParamsDefault, setParamsForData
 
 
 callDir=chdir(pplk_homeDir());

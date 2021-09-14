@@ -1,26 +1,46 @@
 function PRM = pplk_unifyPRM(V, mask, method)
 % PRM = pplk_unifyPRM(V, mask, method)
+% TODO description
+% INPUTS
+%   V 
+%       Matrix of indices' values.
 %
-% V - matrix of indices' values
-% mask - logic vector with 1's where reverse of index's value has to be
-% considered
-% method -	
-%   'minmax': max-like: value_i/max, min-like: min/value_i
-%   'range' : normalize on [0,1] (default)
-%   'range0': move range to start with 0
-%   'range1': move range to end with 1
-%   'pos'   : move indeces with negative values to start with 0
-%   'prob'  : transform to probabilities, sum is 1
-%   'rank'	: rank values, 1 for the poorest value, 2, 3, etc.
-%   'rank10': rank values on interval [0,1]; 1 for the highest value
-%   'rankRankAggreg': rank values, 1 for the poorest value, other are less
-%             than 1 (suitable for Rank Aggregation)
-%   'none'  : do nothing, PRM = V
+%   mask 
+%       Logic vector with 1's where reverse of index's value has to be
+%       considered.
 %
-
-
+%   method 	
+%           'minmax'
+%               max-like: value_i/max, min-like: min/value_i.
+%           'range' 
+%               Normalize on [0,1] (default).
+%           'range0'
+%               Move range to start with 0.
+%           'range1'
+%               Move range to end with 1.
+%           'pos'   
+%               Move indeces with negative values to start with 0.
+%           'prob'
+%               Transform to probabilities, sum is 1.
+%           'rank'
+%               Rank values, 1 for the poorest value,..., ascending.
+%           'rank10'
+%               Rank values on interval [0,1]; 1 for the highest value.
+%           'rankRankAggreg': 
+%               rank values, 1 for the poorest value, other are less than 1
+%               (suitable for Rank Aggregation).
+%           'none'
+%               Do nothing, PRM = V.
+%
+%   TODO Outputs
+%
 % If not specifed otherwise, we assume that every index assigns low value
 % to low quality clustering and high to better ones.
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 if ~exist('mask','var') || isempty(mask)
 	mask = false(1,size(V,2));
 end

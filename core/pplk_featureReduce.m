@@ -1,78 +1,106 @@
 function [dataR,featInd] = pplk_featureReduce(data, method, k, varargin)
 % [dataR,featInd] = pplk_featureReduce(data, method, k, varargin)
-%
 % Removes uninformative and redundant indices using feature reduction
 % (unsupervised feature selection and extraction).
-%--------------------------------------------------------------------------
+%
 % INPUTS
-%   data   :  matrix with unified validity indices
-%   method :  method to use for feature reduction:
-%           ----------------------- selection -----------------------------
-%           - 'FSFS' (Mitra et al., 2002)
-%           - 'LS'   (Laplacian Score by He et al., 2005)
-%           - 'SPEC' (Spectral feature selection, Zhao & Liu 2007)
-%           - 'FSKM' (feature selection with k-medoids, Pepelka 2014)
-%           ---------------- extraction/transformation --------------------
-%           - 'PCA'
-%           - 'KPCA' (Scholkopf et al., 1998)
-%           - 'ICA'  (FastICA by Hyravinen et al., 2000)
-%           - any of supported methods in the Dimensionality reduction
-%             toolbox (by van der Maaten).
-%             Unsupervised (prefered):
-% 			    'ProbPCA', 'MDS', 'FactorAnalysis',  'Isomap', 'Laplacian',
-% 			    'HessianLLE', 'LTSA','FastMVU', 'DiffusionMaps', 'SNE',
-% 			    'SymSNE', 'tSNE', 'SPE', 'Autoencoder'
-%             Unsupervised (occasional singularity problem on PRM data)
-% 			    'GPLVM', 'Sammon', 'LandmarkIsomap', 'LLE', 'MVU', 'CCA',
-% 			    'LandmarkMVU', 'LPP', 'NPE', 'LLTSA', 'LLC',
-% 			    'ManifoldChart', 'CFA'
-%             Supervised / labeled
-% 			    'LDA', 'GDA', 'NCA', 'MCML', 'LMNN'
-%           - 'FEKM' (feature extraction with k-means, Pepelka 2014)
+%   data
+%       A N-by-D matrix of data, where N is number of data samples and D is
+%       number of dimensions.
 %
-%   k    :
-%          - if k is a number, then it represents number of
-%          selected/extracted features. Exception is the method 'FSFS',
-%          where k approximately equals the number of selected features.
+%   method  
+%       Method to use for feature reduction.
 %
-%          - if k is non-existent, empty or string, estimation of intrinsic
-%          dimensionality is employed. If string, estimation is performed
-%          using method with such a name.
-%          Possible options are:
-%            'CorrDim','NearNbDim','GMST','PackingNumbers','EigValue','MLE',
-%            'MiND_ML','MiND_KL','DANCo','DANCoFit','kNN1','kNN2','kNN3',
-%            'Hein','Takens'.
+%           feature selection
+%           'FSFS' 
+%               Mitra et al., 2002.
+%           'LS'   
+%               Laplacian Score by He et al., 2005.
+%           'SPEC' 
+%               Spectral feature selection, Zhao & Liu 2007.
+%           'FSKM'
+%               Feature selection with k-medoids, Pepelka 2014.
 %
-%   varargin :  name-value list of optional parameters
-%			FSFS:
-%				'sim_method' -> 'cor' | 'lin' | 'mic'
-%			LS:
-%				'neighbor_mode' -> 'KNN' | 'Supervised'
-%				'weight_mode'   -> 'Binary' | 'HeatKernel' | 'Cosine'
-%				'kNN'           -> number of k nearest neighbors
-%				'sigma'			-> if weight_mode is HeatKernel, sigma is
-%                                  used for gaussian kernel width
-%           KPCA:
-%				'kernel'	-> 'Gaussian' | 'Polynomial' | 'PolyPlus' | 'Linear'
-%				'sigma'     -> width of Gaussian kernel
-%               'd'         -> param of Polynomial or PolyPlus kernel
+%           feature extraction/transformation
+%           'PCA'
+%           'KPCA' 
+%               Scholkopf et al., 1998.
+%           'ICA'  
+%               FastICA by Hyravinen et al., 2000.
+%           any of supported methods in the Dimensionality reduction
+%           toolbox (by van der Maaten).
+%           Unsupervised (prefered):
+%               'ProbPCA', 'MDS', 'FactorAnalysis',  'Isomap', 'Laplacian',
+%               'HessianLLE', 'LTSA','FastMVU', 'DiffusionMaps', 'SNE',
+%               'SymSNE', 'tSNE', 'SPE', 'Autoencoder'
+%           Unsupervised (occasional singularity problem on PRM data)
+%               'GPLVM', 'Sammon', 'LandmarkIsomap', 'LLE', 'MVU', 'CCA',
+%               'LandmarkMVU', 'LPP', 'NPE', 'LLTSA', 'LLC',
+%               'ManifoldChart', 'CFA'
+%           Supervised / labeled
+%               'LDA', 'GDA', 'NCA', 'MCML', 'LMNN'
+%           'FEKM' 
+%               Feature extraction with k-means, Pepelka 2014.
 %
-%           ICA:
-%				'kernel'	-> 'Gaussian' | 'pow3' | 'tanh' | 'skew'
-%				'sigma'     -> width of Gaussian kernel
-%               'd'         -> param of tanh kernel
+%   k
+%       If k is a number, then it represents number of selected/extracted
+%       features. Exception is the method 'FSFS', where k approximately
+%       equals the number of selected features.
 %
-%			OTHER:
-%				varargin is directly passed to Dimensionality toolbox. See
-%				implementation below for details.
+%       If k is non-existent, empty or string, estimation of intrinsic
+%       dimensionality is employed. If string, estimation is performed
+%       using method with such a name.
+%       Possible options are:
+%         'CorrDim','NearNbDim','GMST','PackingNumbers','EigValue','MLE',
+%         'MiND_ML','MiND_KL','DANCo','DANCoFit','kNN1','kNN2','kNN3',
+%         'Hein','Takens'.
+%               
+%   varargin
+%       Name-value list of optional parameters.
+%           FSFS
+%               'sim_method' 
+%                   'cor' | 'lin' | 'mic'
+%           LS
+%               'neighbor_mode' 
+%                   'KNN' | 'Supervised'
+%               'weight_mode'   
+%                   'Binary' | 'HeatKernel' | 'Cosine'
+%               'kNN'           
+%                   Number of k nearest neighbors.
+%               'sigma'		
+%                   If weight_mode is HeatKernel, sigma is used for
+%                   gaussian kernel width.
+%           KPCA
+%               'kernel'
+%                   'Gaussian' | 'Polynomial' | 'PolyPlus' | 'Linear'
+%               'sigma'    
+%                   Width of Gaussian kernel.
+%               'd'    
+%                   Param of Polynomial or PolyPlus kernel.
+%           ICA
+%               'kernel'	 
+%                   'Gaussian' | 'pow3' | 'tanh' | 'skew'
+%               'sigma'     
+%                   Width of Gaussian kernel.
+%               'd'      
+%                   Param of tanh kernel.
+%
+%           OTHER:
+%               varargin is directly passed to Dimensionality toolbox. See
+%               implementation below for details.
+%
 %
 % OUTPUTS
-%   dataR   : reduced PRM matrix with the selected/extracted features
-%   featInd : - indices of the remaining features, if selection occures,
-%             - vector of NaN's (as many as number of remaining features)
-%             if extraction occures
+%   dataR
+%       Reduced data matrix with the selected/extracted features.
 %
-% ACKNOWLEDGEMENTS and REFERENCES
+%   featInd 
+%       - Indices of the remaining features, if selection occures.
+%       - Vector of NaN's (as many as number of remaining features) if
+%         extraction occures.
+%
+%
+% ACKNOWLEDGEMENTS AND REFERENCES
 %
 % Matlab Toolbox for Dimensionality Reduction
 % (C)Laurens van der Maaten, Delft University of Technology
@@ -85,10 +113,10 @@ function [dataR,featInd] = pplk_featureReduce(data, method, k, varargin)
 %      Tilburg University, Technical Report, TiCC-TR 2009-005, 2009.
 %
 % Feature Selection using Feature Similarity
-%   P. Mitra, C. A. Murthy and S. K. Pal, Unsupervised Feature
-%   Selection using Feature Similarity, IEEE Transactions on Pattern
-%   Analysis and Machine Intelligence, Vol. 24, No. 4, pp 301-312,April 2002.
-%   Code written by Pabitra Mitra.
+%   P. Mitra, C. A. Murthy and S. K. Pal, Unsupervised Feature Selection
+%   using Feature Similarity, IEEE Transactions on Pattern Analysis and
+%   Machine Intelligence, Vol. 24, No. 4, pp 301-312,April 2002. Code
+%   written by Pabitra Mitra.
 %
 % Laplacian Score
 %   Xiaofei He, Deng Cai and Partha Niyogi, "Laplacian Score for
@@ -113,11 +141,11 @@ function [dataR,featInd] = pplk_featureReduce(data, method, k, varargin)
 %   Neural Networks, 13(4-5), 411-430.
 %   FastICA code written by Hugo Gävert, Jarmo Hurri, Jaakko Särelä,
 %   and Aapo Hyvärinen.
-%--------------------------------------------------------------------------
-% File is a part of the Pepelka package.
-% (C) Nejc Ilc (nejc.ilc@fri.uni-lj.si)
-% Last modification: 28. 6. 2013
-%--------------------------------------------------------------------------
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 callDir=chdir(pplk_homeDir());
 
 featInd = NaN;

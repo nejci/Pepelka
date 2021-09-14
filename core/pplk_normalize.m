@@ -1,5 +1,4 @@
 function sD = pplk_normalize(sD,method,comps)
-
 %based on: SOM_NORMALIZE (Re)normalize data or add new normalizations.
 %
 % sS = som_normalize(sS,[method],[comps])
@@ -10,39 +9,58 @@ function sD = pplk_normalize(sD,method,comps)
 %   sS = som_normalize(sS,'histC',[1:3 10])
 %
 %  Input and output arguments ([]'s are optional):
-%   sS                The data to which the normalization is applied.
-%                     The modified and updated data is returned.
-%            (struct) data or map struct
-%            (matrix) data matrix (a matrix is also returned)
-%   [method]          The normalization method(s) to add/use. If missing,
-%                     or an empty variable ('') is given, the
-%                     normalizations in sS are used.
-%            (string) identifier for a normalization method to be added:
-%                     'var', 
-%                     'range', 
-%                     'log', 
-%                     'logistic', 
-%                     'histD', 
-%                     'histC',
-%                     'norm',
-%                     'zscore',
-%                     'propor'.
+%   sS                
+%       The data to which the normalization is applied. The modified and
+%       updated data is returned. Can be:
+%           - Data or map struct.
+%           - Data matrix (a matrix is also returned).
+%   [method]          
+%       The normalization method(s) to add/use. If missing, or an empty
+%       variable ('') is given, the normalizations in sS are used.
+%       - Identifier for a normalization method to be added:
+%           'var'
+%               Variance is normalized to one (linear operation).
+%           'range'
+%               Values are normalized between [0,1] (linear operation).
+%           'log'
+%               Natural logarithm is applied to the values:
+%               xnew = log(x-m+1) where m = min(x).
+%           'logistic'
+%               Logistic or softmax trasformation which scales all possible
+%               values between [0,1].
+%           'histD'
+%               Histogram equalization, values scaled between [0,1].
+%           'histC'
+%               Approximate histogram equalization with partially linear
+%               operations. Values scaled between [0,1].
+%           'norm'
+%               Each data vector becomes of unit length (||data_i|| = 1).
+%           'zscore'
+%               Same as 'var'! substract data vector the data mean and
+%               divide by stdev of data (alse called
+%               zero-mean-unit-variance).
+%           'propor'
+%               Proportional scaling to [0,1]. Same as 'range' except that
+%               it preserves ratios between variables.
+%           'eval'
+%               Freeform operations.
+%           'maxdist'
+%               Normalize on max pair-wise distance.
+%           
+%       - Normalization struct, or an array of such.
+%         Alternatively, a map/data struct can be given in which case its
+%         '.comp_norm' field is used (see below).
+%       - A cell array of normalization structs. Typically, the
+%         '.comp_norm' field of a map/data struct. The length of the array
+%         must be equal to data dimension.
+%       - Norm and denorm operations in a cellstr array
+%         which are evaluated with EVAL command with variable name 'x'
+%         reserved for the variable.
+%   [comps]
+%       Vector of components to which the normalization is applied, default
+%       is [1:dim] ie. all components.
 %
-%            (struct) Normalization struct, or an array of such.
-%                     Alternatively, a map/data struct can be given
-%                     in which case its '.comp_norm' field is used
-%                     (see below).
-%            (cell array) Of normalization structs. Typically, the
-%                     '.comp_norm' field of a map/data struct. The
-%                     length of the array must be equal to data dimension.
-%            (cellstr array) norm and denorm operations in a cellstr array
-%                     which are evaluated with EVAL command with variable
-%                     name 'x' reserved for the variable.
-%   [comps]  (vector) the components to which the normalization is
-%                     applied, default is [1:dim] ie. all components
 %
-% For more help, try 'type som_normalize' or check out online documentation.
-% See also SOM_DENORMALIZE, SOM_NORM_VARIABLE, SOM_INFO.
 
 %%%%%%%%%%%%% DETAILED DESCRIPTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -74,7 +92,7 @@ function sD = pplk_normalize(sD,method,comps)
 % detailed descriptions, see SOM_NORM_VARIABLE.
 %
 %   method     description
-%   'none'     skip noramlization, data unchanged
+%   'none'     skip normalization, data unchanged
 %   'var'      Variance is normalized to one (linear operation).
 %   'range'    Values are normalized between [0,1] (linear operation).
 %   'log'      Natural logarithm is applied to the values:

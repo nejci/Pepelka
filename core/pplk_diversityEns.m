@@ -1,33 +1,55 @@
 function [dvrsMean, dvrsSpread, dvrsComb1, dvrsComb2, accu] = pplk_diversityEns(labelsEns,labelsRef,method,measures)
 % [dvrsMean, dvrsSpread, dvrsComb1, dvrsComb2, accu] = pplk_diversityEns(labelsEns,labelsRef,method,measures)
 % Computes diversity measures from partitions in the ensemble.
-%--------------------------------------------------------------------------
+%
 % INPUTS		
-% labelsEns    cluster ensemble - labels ara in columns of matrix [N X E], 
-%              where N - num. of data points, E - num. of clusterings
-% labelsRef    reference partitioning, relevant only for methods 'NPW'
-% method       PW - pairwise
-%              NPW - non-pairwise, required labelsRef
-% measure      external validation indeces names (one or more)
+%   labelsEns    
+%       Cluster ensemble - labels are stored in the columns of an N-by-E
+%       matrix, where N is number of data points and E is number of
+%       clusterings.
+%
+%   labelsRef    
+%       Reference partitioning, relevant only for methods 'NPW'.
+%
+%   method       
+%       PW
+%           Pairwise.
+%       NPW 
+%           Non-pairwise, required labelsRef.
+%
+%   measures 
+%       External validation indeces names (one or more).
+%
 %
 % OUTPUTS
-% dvrsMean     mean of PW or NPW diversity measure across ensemble members
-% dvrsSpread   sum of standard deviation of NPW diversity
-% dvrsComb1    combined measure: 1/2*(1-dvrsMean + dvrsSpread)
-% dvrsComb2    combined measure: dvrsSpread/dvrsMean
-% accu         accuracy of ensemble members
-%--------------------------------------------------------------------------
-% Last modification: 20 June 2014
-% (C) Pepelka Package, Nejc Ilc (nejc.ilc@fri.uni-lj.si)
-%--------------------------------------------------------------------------
-% References:
+%   dvrsMean     
+%       Mean of PW or NPW diversity measure across ensemble members.
+%
+%   dvrsSpread   
+%       Sum of standard deviation of NPW diversity.
+%
+%   dvrsComb1    
+%       Combined measure: 1/2*(1-dvrsMean + dvrsSpread).
+%
+%   dvrsComb2    
+%       Combined measure: dvrsSpread/dvrsMean.
+%
+%   accu         
+%       Accuracy of ensemble members.
+%
+%
+% ACKNOWLEDGEMENTS AND REFERENCES
 %   X. Fern and C. Brodley, "Random projection for high dimensional
 %     data clustering: A cluster ensemble approach," in International
 %     Conference on Machine Learning, 2003. 
 %   S. T. Hadjitodorov, L. I. Kuncheva, and L. P. Todorova, "Moderate
 %     diversity for better cluster ensembles," Information Fusion, vol. 7,
-%     no. 3, pp. 264�275, Sep. 2006.
-%--------------------------------------------------------------------------
+%     no. 3, pp. 264-275, Sep. 2006.
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 
 callDir=chdir(pplk_homeDir());
 

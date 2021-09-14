@@ -1,31 +1,48 @@
 function dimEst = pplk_dimEstimation(data, method)
 % dimEst = pplk_dimEstimation(data, method)
-%
 % Performs an estimation of the intrinsic dimensionality of data.
-%--------------------------------------------------------------------------
-% INPUTS
-%   data:  n X d matrix of data (each row represents data point)
 %
-%   method:
-%   Choose one of the following methods:
-%   - 'CorrDim' (based on correlation dimension),
-%   - 'NearNbDim' (based on nearest neighbor dimension),
-%   - 'GMST' (based on the analysis of the geodesic minimum spanning tree),
-%   - 'PackingNumbers' (based on the analysis of data packing numbers),
-%   - 'EigValue' (based on analysis of PCA eigenvalues),
-%   - 'MLE' (maximum likelihood estimator),
-%   - 'MiND_ML' (Minimum Neighbor Distance)
-%   - 'MiND_KL' (Minimum Neighbor Distance using Kullback-Leibler divergence)
-%   - 'DANCo' (Dimensionality from Angle and Norm Concentration)
-%   - 'DANCoFit' (fast Dimensionality from Angle and Norm Concentration)
-%   - 'kNN1', 'kNN2', 'kNN3' (J. A. Costa and A. O Hero, 2003,2004)
-%   - 'Hein' (M. Hein & J-Y. Audibert, 2005)
-%   - 'Takens'
+% INPUTS
+%   data
+%       A N-by-D matrix of data, where N is number of data samples and D is
+%       number of dimensions.
+%
+%   method
+%       Choose one of the following methods:
+%
+%       'CorrDim' 
+%           Based on correlation dimension.
+%       'NearNbDim' 
+%           Based on nearest neighbor dimension.
+%       'GMST' 
+%           Based on the analysis of the geodesic minimum spanning tree.
+%       'PackingNumbers' 
+%           Based on the analysis of data packing number.
+%       'EigValue' 
+%           Based on analysis of PCA eigenvalues.
+%       'MLE' 
+%           Maximum likelihood estimator.
+%       'MiND_ML' 
+%          Minimum Neighbor Distance.
+%       'MiND_KL' 
+%           Minimum Neighbor Distance using Kullback-Leibler divergence.
+%       'DANCo' 
+%           Dimensionality from Angle and Norm Concentration.
+%       'DANCoFit' 
+%           Fast Dimensionality from Angle and Norm Concentration.
+%       'kNN1', 'kNN2', 'kNN3' 
+%           J. A. Costa and A. O Hero, 2003,2004.
+%       'Hein' 
+%          M. Hein & J-Y. Audibert, 2005.
+%       'Takens'
+%
 %
 % OUTPUTS
-%   dimEst: estimated intrinsic dimensionallity of the data
+%   dimEst 
+%       Estimated intrinsic dimensionallity of the data.
 %
-% ACKNOWLEDGEMENTS
+%
+% ACKNOWLEDGEMENTS AND REFERENCES
 % Matlab Toolbox for Dimensionality Reduction
 % (C)Laurens van der Maaten, Delft University of Technology 
 % The toolbox can be obtained from http://homepage.tudelft.nl/19j49 
@@ -43,7 +60,7 @@ function dimEst = pplk_dimEstimation(data, method)
 %   C.Ceruti, S.Bassis, A.Rozza, G.Lombardi, E.Casiraghi, P.Campadelli
 %     DANCo: An intrinsic dimensionality estimator exploiting angle 
 %     and norm concentration
-%     Pattern Recognition, vol. 47, no. 8, pp. 2569�2581, 2014
+%     Pattern Recognition, vol. 47, no. 8, pp. 2569-2581, 2014
 %
 % Matthias Hein and Jean-Yves Audibert
 % URL: http://www.ml.uni-saarland.de/code/IntDim/IntDim.htm
@@ -62,11 +79,11 @@ function dimEst = pplk_dimEstimation(data, method)
 %    J. A. Costa and A. O. Hero, "Geodesic Entropic Graphs for Dimension and
 %      Entropy Estimation in Manifold Learning", to appear in IEEE Trans.
 %      on Signal Processing, Aug., 2004.
-%--------------------------------------------------------------------------
-% File is a part of the Pepelka package. 
-% (C) Nejc Ilc (nejc.ilc@fri.uni-lj.si)
-% Last modification: 28. 6. 2013 
-%--------------------------------------------------------------------------
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
 callDir=chdir(pplk_homeDir());
 
 if ~exist('method','var') || isempty(method)

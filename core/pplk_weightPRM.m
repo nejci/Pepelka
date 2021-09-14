@@ -1,5 +1,5 @@
 function [weights] = pplk_weightPRM(PRM,weightMethod,weightMode)
-
+%   TODO dokumentacija
 callDir=chdir(pplk_homeDir());
 
 if ~exist('weightMethod','var') || isempty(weightMethod)

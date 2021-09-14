@@ -1,24 +1,22 @@
 function params=pplk_setParamsDefault()
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            CORE                                        
-%------------------------------------------------------------------------
-%                          Module I.                                     
-%          CLUSTERERS PARAMETERS SETTING to DEFAULT
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FUNCTION:		pplk_setParamsDefault 
-% INPUTS:		none
-% OUTPUTS:		params		(struct)	structure with default parameters'
-%										values
+% params=pplk_setParamsDefault()
+% Function returns default parameters' values for implemented clustering
+% methods.
 %
-% DESCRIPTION:	function returns default parameters' values for implemented
-%				clustering methods
+% INPUTS
+%   none
 %
-% SEE ALSO:		pplk_genEns
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Last modification: 27. September 2013 
-% (C) Pepelka Package, Nejc Ilc (nejc.ilc@fri.uni-lj.si)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% OUTPUTS		
+%   params
+%       Structure with default parameters' values.
+%
+%
+% This is a part of the Pepelka package.
+% Contact: Nejc Ilc (nejc.ilc@fri.uni-lj.si)
+% https://github.com/nejci/Pepelka
+%
+% See also:		pplk_genEns
 
 callDir=chdir(pplk_homeDir());
 

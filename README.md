@@ -8,3 +8,7 @@ It provides functions for:
 - visualization of clustering results.
 
 Pepelka includes a lot of artificial and real-world datasets.
+
+## Getting started
+
+Run `setup.m` in MATLAB.
